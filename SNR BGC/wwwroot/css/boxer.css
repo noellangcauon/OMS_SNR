@@ -1,0 +1,80 @@
+﻿input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.number-input {
+    display: flex;
+}
+
+#txtNum input {
+    width: 100%;
+    border: solid 1px lightgrey;
+    border-radius: 0;
+    /*text-align: center*/
+}
+
+.spinner {
+    border: solid 1px lightgrey;
+}
+
+    .spinner:hover {
+        background: lightgrey;
+    }
+
+    .spinner:first-child {
+        border-radius: 3px 0 0 3px;
+    }
+
+    .spinner:last-child {
+        border-radius: 0 3px 3px 0;
+    }
+
+
+#btnUPC {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#txtQty{
+    margin-top: 5px;
+    font-size:150%;
+}
+.OnUse {
+    background: rgb(255,255,255);
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(5,124,195,1) 100%);
+    color: black;
+}
+.OnComplete {
+    background: rgb(255,255,255);
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(0,121,0,1) 100%);
+    color: black;
+}
+.OnInsufficient {
+    background: rgb(255,255,255);
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(214,12,12,1) 100%);
+    color: black;
+}
+#reader {
+    width: 100%;
+}
+
+#txtInputLocation {
+    width: 100%;
+}
+
+
+#divMode {
+    border-radius: 15px;
+    /*background-color: lightgray;*/
+    padding-left: 15px;
+    padding-right: 15px;
+}
+#btnQRScan {
+    border-radius: 100px !important;
+    width: 183px !important;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}

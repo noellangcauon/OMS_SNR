@@ -1,0 +1,207 @@
+﻿@{
+    var error = TempData["Error"] as string;
+    Layout = "~/Views/Shared/CodefoxLayout.cshtml";
+}
+
+
+<!-- Content Column -->
+
+<section class="section">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <h3 class="m-0 font-weight-bold text-primary">Discrepancy Report</h3><br />
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="card shadow-none">
+
+                                <div class="row">
+                                    
+                                    <div class="col-md-2">
+                                        <div class="row">
+
+
+                                            <div class="col-md-5 text-align:center align-items-md-center">
+                                                <label> Date From </label>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <input class="form-control" id="dateFrom" type="date" />
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="row">
+                                            <div class="col-md-4 text-align:center align-items-md-center">
+                                                <label> Date To </label>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <input class="form-control" id="dateTo" type="date" />
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="row">
+                                            <div class="col-md-4 text-align:center align-items-md-center">
+                                                <label></label>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <button type="button" id="filterTable" class="btn btn-primary mb-lg-3" onclick="getList()"> Filter</button>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                 </div>
+
+                            </div>
+
+                        </div>
+                        @* <h3 class="m-0 font-weight-bold text-primary">NOF ITEMS</h3><br />*@
+                        <div class="tab-content pt-2" id="">
+                            <div class="tab-pane fade show active" id="" role="tabpanel">
+                                <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="exceptionItems">
+                                    <thead>
+                                        <tr>
+
+                                            <th style="white-space: nowrap; color: blue;">Order ID</th>
+                                            <th style="white-space: nowrap; color: blue;">Module</th>
+                                            <th style="white-space: nowrap; color: blue;">Tub No</th>
+                                            <th style="white-space: nowrap; color: blue;">Total Order Items</th>
+                                            <th style="white-space: nowrap; color: blue;">Total Box Order Item</th>
+                                            <th style="white-space: nowrap; color: blue;">Packer User</th>
+                                            <th style="white-space: nowrap; color: blue;">Picker User</th>
+                                            <th style="white-space: nowrap; color: blue;">Status</th>
+                                            <th style="white-space: nowrap; color: blue;">Date Process</th>
+                                            <th style="white-space: nowrap; color: blue;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="exceptionItems-tbody"></tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<div class="modal fade bd-example-modal-lg" id="clearItemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Clear Item(s)</h5>
+                <button class="close" onclick="cancel()" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Are you sure you want to clear this item(s)?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="cancel()" data-dismiss="modal">Cancel</button>
+                <button id="logout" type="button" onclick="getCheckItems()" class="btn btn-primary" data-dismiss="modal">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-example-modal-lg" id="ActivateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Activate User</h5>
+                <button class="close" onclick="cancelActivate()" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Are you sure you want to activate this user?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="cancelActivate()" data-dismiss="modal">Cancel</button>
+                <button id="logout" type="button" onclick="ActivateUser()" class="btn btn-primary" data-dismiss="modal">Activate</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<button type="button" class="btn btn-primary" id="itemModalsBtn" style="display:none;" data-toggle="modal" data-target="#itemModals">
+</button>
+<div id="itemModals" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="itemModals" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="overlay" id="addedit-modal-overlay" hidden>
+                <span class='spinner-border spinner-border-md'></span>
+            </div>
+            <div class="modal-header bg-primary border-bottom">
+                <h4 class="modal-title" id="addedit-modalLabel" style="color:white">Order Details</h4>
+                <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="card-header py-3">
+
+                <span id="itemsOrderIdHeader" style="display:none"></span>
+                <h5 class="m-0 font-weight-bold text-primary" id="itemsTxtHeader"></h5>
+                <h5 class="m-0 font-weight-bold text-primary" id="customerTxtHeader"></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="sortable table table-bordered table-responsive-md table-hover" id="tblViewDetails" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th style="white-space: nowrap;">SKU</th>
+                                    <th style="white-space: nowrap;">Item Image</th>
+                                    <th style="white-space: nowrap;">Item Name</th>
+                                    <th style="white-space: nowrap;">Order Date</th>
+                                    <th>Price</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            @*<tfoot>
+                                <tr class="text-right" style="font-size: 22px;font-weight: 800;">
+                                    <td colspan="4">Grand Total: </td>
+                                    <td colspan="1" style="text-align: center;color:red;" id="trn_grand_total">₱<span id="txtTotalPrice"></span></td>
+                                </tr>
+                            </tfoot>*@
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-light close" data-bs-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+
+    <script src="@Url.Content("~/Scripts/ExceptionReportDiscrepancy.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/datatables.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/DataTables-1.11.5/js/dataTables.jqueryui.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/jquery.validate/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/dataTables.buttons.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/buttons.html5.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/pdfmake.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/vfs_fonts.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/JSZip-2.5.0/jszip.min.js")" type="text/javascript"></script>
+
+    }
+<link href="~/css/user.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/DataTables-1.11.5/css/dataTables.jqueryui.min.css" rel="stylesheet" type="text/css" />
+@*<link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">*@
+<link href="~/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">

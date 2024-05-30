@@ -1,0 +1,14 @@
+﻿.hover-effect:hover {
+    opacity: 0.6;
+}
+.hover-effect:active {
+    opacity: 0.3;
+}
+.dataTables_scrollHeadInner, .table {
+    width: 100% !important;
+}
+
+.dataTables_scrollFootInner, .table {
+    width: 100% !important;
+}
+

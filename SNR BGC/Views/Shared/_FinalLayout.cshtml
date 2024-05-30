@@ -1,0 +1,537 @@
+﻿@using System.Linq;
+@{
+
+    var claimsIdentity = (System.Security.Claims.ClaimsIdentity)User.Identity;
+
+    var userRole = claimsIdentity.Claims.ToList()[2].Value;
+    var userAccess = claimsIdentity.Claims.ToList()[3].Value;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    @if (userAccess.Contains("Runner"))
+    {
+        <title>OMS Runner</title>
+    }
+    else if (userAccess.Contains("Picker"))
+    {
+        <title>OMS Picker</title>
+    }
+    else if (userAccess.Contains("Boxer"))
+    {
+        <title>OMS Boxer</title>
+    }
+    else if (userAccess.Contains("OMS"))
+    {
+        <title>OMS LazPee</title>
+    }
+
+    <!-- Custom fonts for this template-->
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    @*<link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">*@
+    <link href="~/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/css/loader.css" rel="stylesheet" type="text/css">
+    <link href="~/vendor/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+   
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+   
+    <!-- Custom styles for this template-->
+
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" />
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+          
+        <!-- Sidebar -->
+        @if (!userAccess.Contains("Runner") && !userAccess.Contains("Picker") && !userAccess.Contains("Boxer"))
+        {
+            <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+                <!-- Sidebar - Brand -->
+                <a class="sidebar-brand d-flex align-items-center justify-content-center">
+
+                    <div>
+                        @*<h5 id="ribbonTag"></h5>*@
+                        <h1 style="font-family:Arial;" class="font-weight-bold font-italic">S&R</h1>
+                    </div>
+
+                </a>
+                <hr class="sidebar-divider my-0">
+
+                <!-- Nav Item - Dashboard -->
+
+                <li class="nav-item active">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+@*                    @if (userRole == "Administrators")
+                    {
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    }*@
+                </li>
+                <hr class="sidebar-divider">
+                <li class="nav-item active">
+                    @{
+
+
+                        foreach (System.Security.Claims.Claim claim in claimsIdentity.Claims.Where(x => x.Type == "userSubModule"))
+                        {
+                            if (claim.Value.Contains("L"))
+                            {
+
+                                <a class="nav-link" asp-controller="Token" asp-action="ViewOrdersLazada">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Lazada Orders</span>
+                                </a>
+
+                            }
+                            if (claim.Value.Contains("S"))
+                            {
+
+                                <a class="nav-link" asp-controller="Shopee" asp-action="ViewShopeeOrder">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Shopee Orders</span>
+                                </a>
+
+                            }
+                            if (claim.Value.Contains("L") || claim.Value.Contains("S"))
+                            {
+
+                                <a class="nav-link" asp-controller="NOFItems" asp-action="ViewNOFItems">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>NOF Items</span>
+                                </a>
+                            }
+                            
+                            if (claim.Value.Contains("L") || claim.Value.Contains("S"))
+                            {
+
+                                <a class="nav-link" asp-controller="DiscrepancyCenter" asp-action="DiscrepancyCenter">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>
+                                        Discrepancy Center
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            <i id="spanCount"></i>
+                                        </span>
+                                        
+                                    </span>
+                                </a>
+                               
+                            }
+
+                            //if (claim.Value.Contains("L") || claim.Value.Contains("S"))
+                            //{
+
+                            //    <a class="nav-link" asp-controller="DiscrepancyCenter" asp-action="DiscrepancyCenter">
+                            //        <i class="fas fa-calendar"></i>
+                            //        <span>
+                            //            Exception Reports
+                            //            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            //                <i id="spanCount"></i>
+                            //            </span>
+
+                            //        </span>
+                            //    </a>
+
+                            //}
+
+                        }
+
+                        }
+
+                    }
+
+                </li>
+
+
+                <!-- Divider -->
+                <!-- Nav Item - Pages Collapse Menu -->
+                @if (userRole == "Administrator")
+                {
+                    <hr class="sidebar-divider">
+
+                    <!-- Heading -->
+                    <div class="sidebar-heading">
+                        Administrator Module
+                    </div>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                   aria-expanded="true" aria-controls="collapseTwo">
+                            <i class="fas fa-fw fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded">
+                                @*<h6 class="collapse-header">Custom Components:</h6>*@
+                                <a class="collapse-item" asp-controller="User" asp-action="CreateUser">User Maintenance</a>
+                                @* <a class="collapse-item" asp-controller="Store" asp-action="AddStore">Store</a>*@
+                            </div>
+                            <div class="bg-white py-2 collapse-inner rounded">
+                                @*<h6 class="collapse-header">Custom Components:</h6>*@
+                                <a class="collapse-item" asp-controller="User" asp-action="AddUser">OMS User Access</a>
+                                @* <a class="collapse-item" asp-controller="Store" asp-action="AddStore">Store</a>*@
+                            </div>
+                        </div>
+                    </li>
+
+
+
+
+                    <!-- Nav Item - Utilities Collapse Menu -->
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+                   aria-expanded="true" aria-controls="collapseUtilities">
+                            <i class="fas fa-fw fa-wrench"></i>
+                            <span>Token</span>
+                        </a>
+                        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                     data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded">
+                                <h6 class="collapse-header">Custom Utilities:</h6>
+                                <a class="collapse-item" asp-controller="Token" asp-action="verifyToken">Lazada Token</a>
+                                <a class="collapse-item" asp-controller="Shopee" asp-action="GetAuth">Shopee Token</a>
+                                @*<a class="collapse-item" asp-controller="Token" asp-action="ViewShopeeToken">Shopee Token</a>*@
+                            </div>
+                        </div>
+                    </li>
+                    <hr class="sidebar-divider">
+                    <hr class="sidebar-divider d-none d-md-block">
+                }
+                <!-- Divider -->
+                <!-- Heading -->
+                <!-- Nav Item - Pages Collapse Menu -->
+                <!-- Divider -->
+                <!-- Sidebar Toggler (Sidebar) -->
+                <div class="text-center d-none d-md-inline">
+                    <button class="rounded-circle border-0" id="sidebarToggle"></button>
+                </div>
+            </ul>
+        }
+
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <button class="btn btn-success" id="btnSendToHub" hidden><i class="bi bi-send"></i></button>
+            <!-- Main Content -->
+            <div id="content" style="flex: initial;">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    @if (!userAccess.Contains("Runner") && !userAccess.Contains("Picker") && !userAccess.Contains("Boxer"))
+                    {
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                    }
+                    @if (userAccess.Contains("Runner"))
+                    {
+                        <!-- Sidebar Toggle (Topbar) -->
+                        @* <button id="switch" class="toggle-switch" type="button" tabindex="0" role="switch" aria-checked="false">
+                    <span class="sr-only">Toggle mode</span>
+                    </button>*@
+                        <div id="toggleButton" class="d-none">
+                            <label class="switch">
+                                <input id="switchMode" type="checkbox" role="switch" checked />
+                                <div class="slider-container">
+                                    <span class="slider"></span>
+                                    @*<svg class="toggle__icon moon" data-state="checked" focusable="false" version="1.1" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32">
+                                <path d="M24.633 22.184c-8.188 0-14.82-6.637-14.82-14.82 0-2.695 0.773-5.188 2.031-7.363-6.824 1.968-11.844 8.187-11.844 15.644 0 9.031 7.32 16.355 16.352 16.355 7.457 0 13.68-5.023 15.648-11.844-2.18 1.254-4.672 2.028-7.367 2.028z"></path>
+                                </svg>*@
+                                    <i class="bi bi-arrow-up-circle-fill toggle__icon moon text-white"></i>
+                                    @*<svg class="toggle__icon sun" state="un-checked" focusable="false" version="1.1" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32">
+                                <path d="M16.001 8c-4.418 0-8 3.582-8 8s3.582 8 8 8c4.418 0 7.999-3.582 7.999-8s-3.581-8-7.999-8v0zM14 2c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM4 6c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM2 14c1.105 0 2 0.895 2 2 0 1.107-0.895 2-2 2s-2-0.893-2-2c0-1.105 0.895-2 2-2zM4 26c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM14 30c0-1.109 0.895-2 2-2 1.108 0 2 0.891 2 2 0 1.102-0.892 2-2 2-1.105 0-2-0.898-2-2zM24 26c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2zM30 18c-1.104 0-2-0.896-2-2 0-1.107 0.896-2 2-2s2 0.893 2 2c0 1.104-0.896 2-2 2zM24 6c0-1.105 0.895-2 2-2s2 0.895 2 2c0 1.105-0.895 2-2 2s-2-0.895-2-2z"></path>
+                                </svg>*@
+                                    <i class="bi bi-arrow-down-circle-fill toggle__icon sun text-white"></i>
+                                </div>
+                            </label>
+                        </div>
+                    }
+
+                    @*<form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group text-center">
+                    <h2 style="background: #4a6fdc;border-radius:10px; color:antiquewhite;" > OMS - S&R</h2>
+                    </div>
+                    </form>*@
+
+                    @if (userAccess.Contains("Runner"))
+                    {
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <div class="center w-100 d-flex justify-content-center"> <span class="mr-2 d-lg-inline text-gray-800 ">Runner App</span></div>
+                    }
+                    else if (userAccess.Contains("Picker"))
+                    {
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <div class="center w-100 d-flex justify-content-center"> <span class="ml-5 d-lg-inline text-gray-800 ">Picker App</span></div>
+                    }
+                    else if (userAccess.Contains("Boxer"))
+                    {
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <div class="center w-100 d-flex justify-content-center"> <span class="ml-5 d-lg-inline text-gray-800 ">Packer App</span></div>
+                    }
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                        @*<li class="nav-item dropdown no-arrow d-sm-none">
+                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <!-- Dropdown - Messages -->
+                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                        aria-labelledby="searchDropdown">
+                        <form class="form-inline mr-auto w-100 navbar-search">
+                        <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 small"
+                        placeholder="Search for..." aria-label="Search"
+                        aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                        <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                        </button>
+                        </div>
+                        </div>
+                        </form>
+                        </div>
+                        </li>*@
+
+
+
+                        <!-- Nav Item - Messages -->
+                        <!-- Nav Item - User Information -->
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown no-arrow">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    @if (userAccess.Contains("OMS"))
+                                    {
+                                        <span class="mr-2 d-none d-lg-inline text-gray-800 " id="userNameProfile">@User.Claims.First().Value</span>
+                                    }
+                                    <img class="img-profile rounded-circle"
+                                     src="../img/undraw_profile.svg">
+
+                                    @*<i class="fas fa-user"></i>*@
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="userDropdown">
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        @User.Claims.First().Value
+                                    </a>
+                                     @if (userAccess.Contains("Boxer")){
+                                        <a class="dropdown-item" href="#" onclick="getOrderId()">
+                                        <i class="bi bi-printer fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Re-print Waybill
+                                    </a>
+                                     }
+                                    @* <a class="dropdown-item" href="#">
+                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Settings
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Activity Log
+                                </a>
+                                <div class="dropdown-divider"></div>*@
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                        Logout
+                                    </a>
+                                </div>
+
+
+                            </li>
+
+
+                        }
+
+                    </ul>
+
+                </nav>
+
+            </div>
+            <div style="padding-right: 1.5rem; padding-left: 1.5rem; ">
+                @RenderBody()
+            </div>
+            <!-- End of Main Content -->
+            <!-- Footer -->
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <div>
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; SNR BGC 2022</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- End of Page Wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you want to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <form id="logoutForm" asp-area="" asp-controller="Home" asp-action="Logout">
+                        <button id="logout" type="submit" class="btn btn-primary">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Reprint Modal-->
+    <button type="button" class="btn btn-primary" id="reprintModalBtn" style="display:none;" data-toggle="modal" data-target="#reprintModal"></button>
+    <div class="modal fade bd-example-modal-lg" id="reprintModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary text-center">
+                    <h5 class="modal-title" id="exampleModalLabel">Re-print Waybill</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div><br />
+
+                <div class="card shadow mb-4" style="overflow-y:auto !important;">
+                    <div class="card-body">
+                        
+                        <h5 id="lblModule" class="text-primary"></h5>
+                        <h5 id="lblOrderId" class="text-primary"></h5>
+
+                        <div>
+                            @*<input type="number" class="form-control" min="10" max="100" />*@
+                            <div class="row mb-1">
+                                <div class="col-12">
+                                        <span>
+                                            ID
+                                        <input id="txtSupervisorID" type="number" class="form-control" oninput="limitLength(this, 4)">
+                                        </span>
+                                </div>
+                                
+
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                        <span>
+                                            PIN
+                                        <input id="txtSupervisorPIN" type="password" inputmode="numeric" pattern="[0-9]*"  class="form-control">
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" id="btnSaveLoc" onclick="" class="btn btn-success">Send to OM <i class="bi bi-send"></i></button>
+                    <button type="button" id="btnSaveLoc" onclick="SupervisorCreds()" class="btn btn-primary" data-dismiss="modal">Print <i class="bi bi-printer"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jsbarcode/JsBarcode.all.min.js" type="text/javascript"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/js/sb-admin-2.min.js"></script>
+    <script src="~/js1/jquery-ui.min.js"></script>
+    @*<script src="~/js1/jquery-3.6.0.js"></script>*@
+
+    <!-- Page level plugins -->
+    @*  <script src="~/vendor/chart.js/Chart.min.js"></script>*@
+
+    <!-- Page level custom scripts -->
+    @*<script src="@Url.Content("~/Scripts/Token.js")" type="text/javascript"></script>*@
+    @*   <script src="~/js/demo/chart-area-demo.js"></script>
+    <script src="~/js/demo/chart-pie-demo.js"></script>*@
+
+    <script src="~/js1/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
+    <style>
+        .swal2-container {
+            z-index: 999999999;
+        }
+
+    </style>
+</body>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: `/DiscrepancyCenter/GetDiscrepancyCount`,
+            type: 'GET',
+
+            success: function (data) {
+                $.each(data, function (count, item) {
+                    console.log(item.boxId);
+                    $('#spanCount').text(item.boxId)
+                })
+
+                console.log(data);
+
+
+
+            }
+        });
+    });
+
+
+</script>
+
+
+</html>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<script src="~/scripts/discrepancyhub.js"></script>

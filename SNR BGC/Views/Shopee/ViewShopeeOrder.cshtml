@@ -1,0 +1,503 @@
+﻿@{
+
+    Layout = "~/Views/Shared/CodefoxLayout.cshtml";
+
+}
+<!-- Content Column -->
+<div class="container-fluid">
+    <div class="col-lg-12 mb-4">
+        <div class="page-title-box">
+            <h3 class="m-0 font-weight-bold text-primary">SHOPEE ORDERS</h3><br />
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-xl-3">
+                <div class="widget-rounded-circle card bg-info shadow-none">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <span class="logo-lg">
+                                    <img src="~/img/shopee-logo-40482.png" alt="" height="70">
+                                </span>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-end">
+                                    <h2 class="text-white mt-2"><span data-plugin="counterup" id="totalOrdersCountShopee">0</span></h2>
+                                    <p class="text-white mb-0 text-truncate">Total Orders</p>
+                                </div>
+                            </div>
+                        </div> <!-- end row-->
+                    </div>
+                </div> <!-- end widget-rounded-circle-->
+            </div> <!-- end col-->
+            <div class="col-md-6 col-xl-3">
+                  <div id="divdateFromShopee">
+                            @*<span>Date From: &nbsp;</span>*@
+                            Date Time From: <input class="form-control shopeeDate" id="dateFromShopee" type="datetime-local" data-val="true" />
+                            @*<input type="date" id="dateFromShopee" class="shopeeDate form-control bg-light small" />*@
+                        </div> 
+
+                        <div id="divdateToShopee">
+                            Date Time To:  <input class="form-control shopeeDate" id="dateToShopee" type="datetime-local" data-val="true" />
+
+                        </div>
+            </div> <!-- end col-->
+        </div>
+       
+        <div class="card card-primary card-outline">
+            <div class="card-body">
+                <div class="row mt-2">
+                    <div class="col-8">
+                        <ul class="nav nav-tabs nav-tabs-bordered" id="myTabShopee" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link w-100 active" id="withoutExcepTabShopee" data-bs-toggle="tab" type="button" role="tab" aria-controls="home" aria-selected="true">Cleared for Picking</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link w-100" id="withExcepTabShopee" data-bs-toggle="tab" type="button" role="tab" aria-controls="home">With Exception</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link w-100" id="pickingOrders" data-bs-toggle="tab" type="button" role="tab" aria-controls="home">Currently Picking</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link w-100" id="forBoxingTabShopee" data-bs-toggle="tab" type="button" role="tab" aria-controls="home">For Packing</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link w-100" id="forCurrentlyPacking" data-bs-toggle="tab" type="button" role="tab" aria-controls="home">Currently Packing</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link w-100" id="toPOSTabShopee" data-bs-toggle="tab" type="button" role="tab" aria-controls="home">For Delivery</button>
+                            </li>
+                                                        
+
+                        </ul>
+                    </div>
+                    <div class="col-12">
+                        <ul class="nav nav-tabs border-0 justify-content-end" id="myTabShopee" role="tablist">
+                            <li style=" display:none;" id="liReportShopee">
+
+                              
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr class="mt-0 pt-0">
+
+
+
+                <div class="card-body">
+                     <div class="row">
+                        <div class="col-md-6 mb-2 align-items-md-center">
+                            <button type="button" class="btn btn-light btn-m waves-effect" id="btnGetOrders" onclick="fetchShopeeOrder()"><span class="fas fa-plus"></span> GET ORDERS</button>
+                            <button type="button" class="btn btn-light btn-m waves-effect" id="btn_edit_user" onclick="reProcess()"><span class="fas fa-edit"></span> RE-PROCESS</button>
+                         
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2 align-items-md-center">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="ShopeeOrderTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th style="white-space: nowrap; color: blue;">ORDER ID</th>
+                                    <th style="white-space: nowrap; color: blue;">ORDER DATE</th>
+                                    <th style="white-space: nowrap; color: blue;">TOTAL ITEMS</th>
+                                    <th style="white-space: nowrap; color: blue;">NO. OF EXECPTIONS</th>
+                                    <th style="white-space: nowrap; color: blue;">TYPE OF EXECPTIONS</th>
+
+                                    <th style="white-space: nowrap; color: blue;">TOTAL AMOUNT</th>
+                                    <th style="white-space: nowrap; color: blue;">PICKER USERNAME</th>
+
+                                    <th style="white-space: nowrap; color: blue;">PACKER USERNAME</th>
+
+
+                                    <th style="white-space: nowrap; color: blue;">TUB NO.</th>
+                                    <th></th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                            </tbody>
+
+                        </table>
+                        @* <button type="button" class="btn btn-primary btn-form-action" id="btn-save" onclick="clickPrintExcel('print')"><i class="bi bi-printer-fill"></i> Print</button>
+                        <button type="button" class="btn btn-primary btn-form-action" id="btn-save" onclick="clickPrintExcel('excel')"><i class="fa fa-download"></i> Download</button>*@
+                    </div>
+                    @*<div class="tab-pane fade" id="bordered-justified-returned-rework">
+                    <table class="table table-striped table-hover tbl-data hover" id="ShopeeOrderTable">
+                    <thead>
+                    <tr>
+                    <th style="white-space: nowrap; color: blue;">ORDER ID</th>
+                    <th style="white-space: nowrap; color: blue;">ORDER DATE</th>
+                    <th style="white-space: nowrap; color: blue;">TOTAL ITEMS</th>
+                    <th style="white-space: nowrap; color: blue;">TOTAL AMOUNT</th>
+                    <th></th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                    </table>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+
+            
+        </div>
+    </div>
+</div>
+
+<button type="button" class="btn btn-primary" id="successModalBtnShopee" style="display:none;" data-toggle="modal" data-target="#successModalShopee">
+</button>
+<div class="modal fade" style="z-index: 999999999999999;" id="successModalShopee" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h5 class="modal-title" id="exampleModalLongTitleShopee"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" style="font-size:larger;" id="successModalDivShopee">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<button type="button" class="btn btn-primary" id="itemShopeeModalBtn" style="display:none;" data-toggle="modal" data-target="#itemShopeeModal">
+</button>
+
+
+@*newModal*@
+
+<div id="itemShopeeModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="itemModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="overlay" id="addedit-modal-overlay" hidden>
+                <span class='spinner-border spinner-border-md'></span>
+            </div>
+            <div class="modal-header bg-primary border-bottom">
+                <h4 class="modal-title" id="addedit-modalLabel" style="color:white">Order Details</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="card-header py-3">
+
+                <span id="itemsOrderIdHeaderShopee" style="display:none"></span>
+                <h5 class="m-0 font-weight-bold text-primary" id="itemsShopeeTxtHeader"></h5>
+                <h5 class="m-0 font-weight-bold text-primary" id="customerShopeeTxtHeader"></h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="sortable table table-bordered table-responsive-md table-hover" id="listOfShopeeItems" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th style="white-space: nowrap;">SKU</th>
+                                    <th style="white-space: nowrap;">Item Image</th>
+                                    <th style="white-space: nowrap;">Item Name</th>
+                                    @*<th>Quantity</th>*@
+                                    <th style="white-space: nowrap;">Order Date</th>
+                                    <th>Exception</th>
+                                    <th style="white-space: nowrap;">Barcode</th>
+                                    <th>Price</th>
+
+                                    @*<th style="white-space: nowrap;">Total Amount</th>*@
+                                    @*<th></th>*@
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                <tr class="text-right" style="font-size: 22px;font-weight: 800;">
+                                    <td colspan="6">Grand Total: </td>
+                                    <td colspan="1" style="text-align: center;color:red;" id="trn_grand_total">₱<span id="txtTotalPrice"></span></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+
+@*<div class="modal fade bd-example-modal-lg" id="itemShopeeModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
+        <div class="modal-content" style="width:130%;">
+            <div class="modal-header modal-header-primary text-center">
+                <h5 class="modal-title">Order Item!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div><br />
+            <div class="card shadow mb-4" style="overflow-y:auto !important;">
+                <div class="card-header py-3">
+
+                    <span id="itemsOrderIdHeaderShopee" style="display:none"></span>
+                    <h5 class="m-0 font-weight-bold text-primary" id="itemsShopeeTxtHeader"></h5>
+                    <h5 class="m-0 font-weight-bold text-primary" id="customerShopeeTxtHeader"></h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="sortable table table-bordered table-responsive-md table-hover" id="listOfShopeeItems" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th style="white-space: nowrap;">SKU</th>
+                                    <th style="white-space: nowrap;">Item Image</th>
+                                    <th style="white-space: nowrap;">Item Name</th>
+                                    <th>Quantity</th>
+                                    <th style="white-space: nowrap;">Order Date</th>
+                                    <th>Exception</th>
+                                    <th style="white-space: nowrap;">Barcode</th>
+                                    <th>Price</th>
+
+                                    <th style="white-space: nowrap;">Total Amount</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                <tr class="text-right" style="font-size: 22px;font-weight: 800;">
+                                    <td colspan="6">Grand Total: </td>
+                                    <td colspan="1" style="text-align: center;color:red;" id="trn_grand_total">₱<span id="txtTotalPrice"></span></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" style="display:none" class="btn btn-primary" id="shopeeMtpBtn" onclick="moveTopickerAlertShopee()"> Move to Picker</button>
+                <button type="button" style="display:none" class="btn btn-primary" id="shopeeMtpCloseBtn" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+<button type="button" class="btn btn-primary" id="moveToPickerModalBtnShopee" style="display:none;" data-toggle="modal" data-target="#moveToPickerModalShopee">
+</button>
+<div class="modal fade" style="z-index: 999999999999999 !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgb(180 180 181); " id="moveToPickerModalShopee" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitlemoveToPicker" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h5 class="modal-title" id="exampleModalLongTitlemoveToPickerShopee"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" style="font-size:larger;" id="moveToPickerModalDivShopee">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="moveTopickerShopee()" data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="divDisplayShopeeOrders" data-request-url="@Url.Action("ViewShopeeOrders", "Shopee")"></div>
+<div id="divViewShopeeOrder" data-request-url="@Url.Action("GetShopeeOrderList", "Shopee")"></div>
+<div id="GetItemShopee" data-request-url="@Url.Action("GetItemShopee", "Shopee")"></div>
+<div id="divMoveToPickerShopee" data-request-url="@Url.Action("MoveToPickerShopee", "Shopee")"></div>
+<div id="divReProcess" data-request-url="@Url.Action("GetOrdersReprocess", "Shopee")"></div>
+@section Scripts {
+    <script>
+        $('#tubCol').hide();
+        $(".shopeeDate").val(getCurrDateTime())
+        $('#myTabShopee li button').click(function () {
+            var t = $(this).attr('id');
+
+            if (t == "withoutExcepTabShopee") {
+                viewShopeeOrders('good')
+                $('#withoutExcepTabShopee').addClass('active');
+                $('#withoutExcepTabShopee').addClass('btn-primary');
+                $("#liReportShopee").hide();
+
+                $("#withExcepTabShopee").removeClass('active');
+                $('#withExcepTabShopee').removeClass('btn-primary');
+
+
+                $("#forBoxingTabShopee").removeClass('active');
+                $('#forBoxingTabShopee').removeClass('btn-primary');
+                $('#forCurrentlyPacking').removeClass('active');
+                $('#forCurrentlyPacking').removeClass('btn-primary');
+
+                $("#toPOSTabShopee").removeClass('active');
+                $('#toPOSTabShopee').removeClass('btn-primary');
+
+                $("#pickingOrders").removeClass('active');
+                $('#pickingOrders').removeClass('btn-primary');
+
+                $('#btnGetOrders').show();
+                $('#divdateFromShopee').show();
+                //$('#tubCol').hide();
+                $('#divdateToShopee').show();
+
+            }
+            else if (t == "withExcepTabShopee") {
+                viewShopeeOrders('bad')
+                $('#withExcepTabShopee').addClass('active');
+                $('#withExcepTabShopee').addClass('btn-primary');
+                $("#liReportShopee").show();
+
+                $('#withoutExcepTabShopee').removeClass('btn-primary');
+                $("#withoutExcepTabShopee").removeClass('active');
+
+                $("#forBoxingTabShopee").removeClass('active');
+                $('#forBoxingTabShopee').removeClass('btn-primary');
+                $('#forCurrentlyPacking').removeClass('active');
+                $('#forCurrentlyPacking').removeClass('btn-primary');
+
+                $("#toPOSTabShopee").removeClass('active');
+                $('#toPOSTabShopee').removeClass('btn-primary');
+                $('#btnGetOrders').show();
+                $('#divdateFromShopee').show();
+                $('#divdateToShopee').show();
+                //$('#tubCol').hide();
+
+                $("#pickingOrders").removeClass('active');
+                $('#pickingOrders').removeClass('btn-primary');
+
+            }
+            else if (t == "forBoxingTabShopee") {
+                viewShopeeOrders('boxTab')
+                $('#forBoxingTabShopee').addClass('active');
+                $('#forBoxingTabShopee').addClass('btn-primary');
+                $("#liReportShopee").show();
+
+                $('#withoutExcepTabShopee').removeClass('btn-primary');
+                $("#withoutExcepTabShopee").removeClass('active');
+
+                $("#withExcepTabShopee").removeClass('active');
+                $('#withExcepTabShopee').removeClass('btn-primary');
+                $('#forCurrentlyPacking').removeClass('active');
+                $('#forCurrentlyPacking').removeClass('btn-primary');
+
+                $("#toPOSTabShopee").removeClass('active');
+                $('#toPOSTabShopee').removeClass('btn-primary');
+                $('#btnGetOrders').hide();
+                $('#divdateFromShopee').hide();
+                $('#divdateToShopee').hide();
+                //$('#tubCol').show();
+
+                $("#pickingOrders").removeClass('active');
+                $('#pickingOrders').removeClass('btn-primary');
+            }
+            else if (t == "toPOSTabShopee") {
+                viewShopeeOrders('POSTab')
+                $('#toPOSTabShopee').addClass('active');
+                $('#toPOSTabShopee').addClass('btn-primary');
+                $("#liReportShopee").show();
+
+                $('#withoutExcepTabShopee').removeClass('btn-primary');
+                $("#withoutExcepTabShopee").removeClass('active');
+
+                $("#forBoxingTabShopee").removeClass('active');
+                $('#forBoxingTabShopee').removeClass('btn-primary');
+
+                $('#forCurrentlyPacking').removeClass('active');
+                $('#forCurrentlyPacking').removeClass('btn-primary');
+                $("#withExcepTabShopee").removeClass('active');
+                $('#withExcepTabShopee').removeClass('btn-primary');
+                $('#btnGetOrders').hide();
+                $('#divdateFromShopee').hide();
+                $('#divdateToShopee').hide();
+                //$('#tubCol').hide();
+
+                $("#pickingOrders").removeClass('active');
+                $('#pickingOrders').removeClass('btn-primary');
+
+            }
+
+            else if (t == "pickingOrders") {
+                viewShopeeOrders('pickingOrders')
+                $('#pickingOrders').addClass('active');
+                $('#pickingOrders').addClass('btn-primary');
+                $("#liReportShopee").show();
+
+                $('#withoutExcepTabShopee').removeClass('btn-primary');
+                $("#withoutExcepTabShopee").removeClass('active');
+
+                $("#forBoxingTabShopee").removeClass('active');
+                $('#forBoxingTabShopee').removeClass('btn-primary');
+
+
+                $("#withExcepTabShopee").removeClass('active');
+                $('#withExcepTabShopee').removeClass('btn-primary');
+
+                $("#toPOSTabShopee").removeClass('active');
+                $('#toPOSTabShopee').removeClass('btn-primary');
+
+                $('#forCurrentlyPacking').removeClass('active');
+                $('#forCurrentlyPacking').removeClass('btn-primary');
+
+                $('#btnGetOrders').hide();
+                $('#divdateFromShopee').hide();
+                $('#divdateToShopee').hide();
+                //$('#tubCol').hide();
+
+            }
+
+            else if (t == "forCurrentlyPacking") {
+                viewShopeeOrders('forCurrentlyPacking')
+                $('#forCurrentlyPacking').addClass('active');
+                $('#forCurrentlyPacking').addClass('btn-primary');
+                $("#liReportShopee").show();
+
+                $('#withoutExcepTabShopee').removeClass('btn-primary');
+                $("#withoutExcepTabShopee").removeClass('active');
+
+                $('#pickingOrders').removeClass('btn-primary');
+                $("#pickingOrders").removeClass('active');
+
+                $("#forBoxingTabShopee").removeClass('active');
+                $('#forBoxingTabShopee').removeClass('btn-primary');
+
+
+                $("#withExcepTabShopee").removeClass('active');
+                $('#withExcepTabShopee').removeClass('btn-primary');
+
+                $("#toPOSTabShopee").removeClass('active');
+                $('#toPOSTabShopee').removeClass('btn-primary');
+
+                $('#btnGetOrders').hide();
+                $('#divdateFromShopee').hide();
+                $('#divdateToShopee').hide();
+                //$('#tubCol').hide();
+
+            }
+
+
+        });
+        @*$(".shopeeDate").val(getCurrDate())*@
+            $("#ribbonTag").text("Shopee Orders")
+    </script>
+
+    <script src="@Url.Content("~/Scripts/Shopee.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/datatables.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/DataTables-1.11.5/js/dataTables.jqueryui.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/jquery.validate/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/dataTables.buttons.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/buttons.html5.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/pdfmake.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/vfs_fonts.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/JSZip-2.5.0/jszip.min.js")" type="text/javascript"></script>
+    @* <script src="~/Scripts/User.js" type="text/javascript"></script>*@
+
+
+}
+<link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/DataTables-1.11.5/css/dataTables.jqueryui.min.css" rel="stylesheet" type="text/css" />
+<link href="~/css/datatable.css" rel="stylesheet" type="text/css" />

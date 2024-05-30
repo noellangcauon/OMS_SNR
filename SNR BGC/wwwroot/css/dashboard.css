@@ -1,0 +1,18 @@
+﻿
+div.p-line1 p{
+    color: #000000
+}
+
+div.p-line1:hover p{
+    color: #348cd4
+}
+tr:nth-child(odd) {
+    background-color: rgba(197, 227, 255, .4) !important;
+}
+
+tr:nth-child(even) {
+    background-color: rgba(197, 227, 255, .07) !important;
+}
+.dropdown-menu{
+    border-radius: 0.25rem;
+}

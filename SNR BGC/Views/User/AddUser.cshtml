@@ -1,0 +1,276 @@
+﻿@model SNR_BGC.Models.UserInfoClass;
+
+@{
+
+    Layout = "~/Views/Shared/CodefoxLayout.cshtml";
+}
+
+<div class="container-fluid">
+     <div class="col-lg-12 mb-4">
+        <div class="page-title-box">
+            <h3 class="m-0 font-weight-bold text-primary">User Access</h3><br />
+        </div>
+     </div>
+    <div class="row">
+        <!-- Content Column -->
+        <div class="col-md-8 mb-4">
+
+            <!-- Project Card Example -->
+            <div class="card shadow mb-4">
+
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">User List</h6><br />
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <div class="" style="margin-right:2%;">
+                                <select name="" id="userCategory" class="form-control">
+                                    <option value="u_username">Search by (User Name)</option>
+                                    <option value="u_fullname">Search by (Full Name)</option>
+                                    <option value="u_role">Search by (User Role)</option>
+                                    <option value="u_module">Search by (User Module)</option>
+                                    <option value="u_submodule">Search by (User Sub Module)</option>
+                                    <option value="u_status">Search by (User Status)</option>
+                                </select>
+                            </div>
+                            <input type="text" id="searchUser" class="form-control bg-light small" placeholder="Search for User..." />
+                            <div class="input-group-append">
+                                <button onclick="fetchUser($('#searchUser').val())" class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="userDataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th class="sorting">User Name</th>
+                                    <th class="sorting">Full Name</th>
+                                    <th>Role</th>
+                                    <th>Module</th>
+                                    <th>Submodule</th>
+                                    <th>Access</th>
+                                    <th>Status</th>
+                                    <th></th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <!-- Illustrations -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Add User</h6>
+                </div>
+                <div class="card-body">
+                    <form action="" method="post">
+                        <div class="form-group" onclick="openUserSearchModal()">
+                            <input type="text" name="userId" value="0" attr="userId" id="uId" style="display:none;" />
+                            <input type="text" style="cursor:pointer;" name="useraccessname" attr="username" id="uname" placeholder="User Name..." class="form-control addUser" disabled />
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="fullname" attr="userFullname" id="fullname" placeholder="Full Name..." class="form-control addUser" disabled />
+                        </div>
+                        <div class="form-group">
+                            <select name="role" id="urole" class="form-control addUserD">
+                                <option value="0">--Role--</option>
+                                <option value="Administrator">Administrator</option>
+                                <option value="User">User</option>
+                                <option value="Visitor">Visitor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="" id="umodule" class="form-control addUserD">
+                                <option value="0">--Module--</option>
+                                <option value="OMS">OMS</option>
+                                <option value="OMS-PICKER">OMS - PICKER</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="" id="usubmodule" class="form-control addUserD">
+                                <option value="0">--Sub Module--</option>
+                                <option value="Lazada">Lazada</option>
+                                <option value="Shoppee">Shoppee</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="" id="ustatus" class="form-control addUserD">
+                                <option value="0">--Status--</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                         <div class="form-group">
+                            <div class="">
+                                <label class="control-label">Module </label>
+                                <div class="col-md-12">
+                                    <label><input type="checkbox" value="A" id="AddAccess" /> Add Access</label>
+                                    <label class="pl-lg-4"><input type="checkbox" value="E" id="EditAccess" /> Edit Access</label>
+                                    <label class="pl-lg-4"><input type="checkbox" value="D" id="DeleteAccess" /> Delete Access</label>
+                                    <label class="pl-lg-4"><input type="checkbox" value="R" id="ReadAccess" /> Read Access</label>
+                                </div>
+                            </div>
+
+                        </div>
+@*                        <div class="form-check">
+                            <input class="form-check-input addUserC" type="checkbox" value="A" id="AddAccess">
+                            <label class="form-check-label" for="AddAccess">
+                                Add Access
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input addUserC" type="checkbox" value="E" id="EditAccess">
+                            <label class="form-check-label" for="EditAccess">
+                                Edit Access
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input addUserC" type="checkbox" value="D" id="DeleteAccess">
+                            <label class="form-check-label" for="DeleteAccess">
+                                Delete Access
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input addUserC" type="checkbox" value="R" id="ReadAccess">
+                            <label class="form-check-label" for="ReadAccess">
+                                Read Access
+                            </label>
+                        </div>*@
+
+                        <input value="Save" id="userInfoBtn" onclick="addUser()" class="btn btn-primary btn-user btn-block" />
+                        <input value="Cancel" id="userCancelBtn" style="display:none;" onclick="clearUserForm()" class="btn btn-primary btn-user btn-block" />
+                    </form>
+                </div>
+            </div>
+        </div>
+ 
+    </div>
+</div>
+
+
+<button type="button" class="btn btn-primary" id="successModalBtn" style="display:none;" data-toggle="modal" data-target="#successModal">
+</button>
+<div class="modal fade" style="z-index: 999999999999999;" id="successModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h5 class="modal-title" id="exampleModalLongTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" style="font-size:larger;" id="successModalDiv">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*modal to delete user*@
+<button type="button" class="btn btn-primary" id="deleteModalBtn" style="display:none;" data-toggle="modal" data-target="#deleteModal">
+</button>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h5 class="modal-title">Delete User!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div>
+                <input type="text" style="display:none;" id="deleteUserId" />
+                <input type="text" style="display:none;" id="deleteUserName" />
+            </div>
+            <div class="modal-body text-center" style="font-size:larger;" id="deleteModalDiv">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="deleteUser()">Yes</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*modal to search user*@
+<button type="button" class="btn btn-primary" id="searchModalBtn" style="display:none;" data-toggle="modal" data-target="#searchModal">
+</button>
+
+<div class="modal fade bd-example-modal-lg" id="searchModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-primary text-center">
+                <h5 class="modal-title">Search User!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div><br />
+            <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                <div class="input-group">
+
+                    <input type="text" id="searchUserList" class="form-control bg-light small" placeholder="Search for User..."
+                           aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button onclick="fetchAD()" class="btn btn-primary" type="button">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </form><br />
+            <div class="card shadow mb-4" style="overflow-y:auto !important;">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">List Of User's</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="sortable table table-bordered table-responsive-md table-hover" id="listOfUsers" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>User Name</th>
+                                    <th>Full Name</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="divAdduser" data-request-url="@Url.Action("InsertUser", "User")"></div>
+<div id="divFetchUser" data-request-url="@Url.Action("FetchUser", "User")"></div>
+<div id="divDeleteUser" data-request-url="@Url.Action("DeleteUser", "User")"></div>
+<div id="divFetchAD" data-request-url="@Url.Action("FetchAD", "User")"></div>
+@section Scripts {
+    <script>
+        $("#ribbonTag").text("User Module")
+
+    </script>
+
+    <script src="@Url.Content("~/Scripts/User.js")" type="text/javascript"></script>
+    @* <script src="~/Scripts/User.js" type="text/javascript"></script>*@
+
+
+}

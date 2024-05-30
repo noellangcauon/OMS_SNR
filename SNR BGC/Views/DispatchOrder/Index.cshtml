@@ -1,0 +1,171 @@
+﻿@model SNR_BGC.Models.ViewModels.DispatchOrderViewModel;
+@{
+
+    Layout = "~/Views/Shared/CodefoxLayout.cshtml";
+
+}
+<!-- Content Column -->
+
+<section class="section">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <h3 class="m-0 font-weight-bold text-primary">Dispatch Orders</h3><br />
+            
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+               
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="Create" asp-antiforgery="true" method="post" role="form" id="frm_dispatch" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="row mb-2">
+                                        <div class="col-lg-2">
+                                            <label class="form-label mt-2">Courier</label>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <select type="text" asp-for="DispatchOrders.CourierTypeId" id="courierTypeId">
+                                                <option value="">Select courier type</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-lg-2">
+                                            <label class="form-label mt-1">Fleet</label>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <select type="text" asp-for="DispatchOrders.FleetTypeId" id="fleetTypeId">
+                                                <option value="">Select fleet type</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="row mb-2">
+                                        <div class="col-lg-2">
+                                            <label class="form-label mt-1">Plate No.</label>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <input  class="form-control" id="txtPlateNo" asp-for="DispatchOrders.PlateNo" id="plateNo"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-2">
+                                            <label class="form-label mt-1">Date</label>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <input class="form-control flatpickr " id="dateCreated" type="date" asp-for="DispatchOrders.DateCreated" />
+                                        </div>
+                                       
+
+                                    </div>
+                                    @*<div class="row">
+                                        <div class="col-lg-2">
+                                            <button type="button" class="form-control" id="sampleBtn">Scan</button>
+                                        </div>
+                                         <div class="col-lg-6">
+                                            <input class="form-control" id="sampleTrackNo" />
+                                        </div>
+
+
+
+                                    </div>*@
+                                </div>
+                            </div>
+                            <div class="row">
+                                 <div class="col-md-2">
+                                        
+                                        <button class="btn btn-primary waves-effect" type="button" id="btn_startScan"><i class="fas fa-eye"></i> Start Scanning</button>
+                                        
+                                 </div>
+                                  <div class="col-md-10" >
+                                        
+                                       
+                                        <input class="form-control" id="txtTrackingNo" onchange="onScan()" style="width:550px;" />
+                                 </div>
+                               
+                                @*<div class="text-end mt-3">
+                                    <button class="btn btn-primary waves-effect" type="button" id="btn_startScan" on ><i class="fas fa-eye"></i> Start Scanning</button>
+
+                                </div>*@
+
+                                <div class="tab-content pt-2" id="borderedTabJustifiedContent">
+                                    <div class="tab-pane fade show active" id="discrepancyDiv" role="tabpanel">
+                                        <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="tbl_dispatchOrder">
+                                            <thead class="table-light">
+                                                <tr>
+
+                                                    <th style="white-space: nowrap; color: blue;">Tracking No.</th>
+                                                    <th style="white-space: nowrap; color: blue;">Order Id</th>
+                                                    <th style="white-space: nowrap; color: blue;">Platform</th>
+                                                    <th style="white-space: nowrap; color: blue;">Scand Date/Time</th>
+                                                    <th style="white-space: nowrap; color: blue;">Status</th>
+                                                    <th style="white-space: nowrap; color: blue;">Remarks</th>
+                                                    <th style="white-space: nowrap; color: blue;"></th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody id="nofItems-tbody"></tbody>
+                                        </table>
+                                    </div>
+
+                                    @* <div class="col-lg-1">
+                                    <button type="button" id="clearItem" class="btn btn-primary mb-lg-3" data-bs-toggle="tooltip" data-bs-placement="left" data-toggle="modal" data-target="#clearItemModal" title="Create New User"> Clear Items</i></button>
+                                    </div>*@
+                                </div>
+                            </div>
+                            <div class="text-end mt-3">
+                                @*<button class="btn btn-secondary waves-effect" id="btn_cancel" type="button"><i class="fas fa-times-circle"></i> Clear</button>*@
+                                <button class="btn btn-primary waves-effect" type="button" id="btn_save" onclick="onSubmit();"><i class="fas fa-save"></i> Save</button>
+                                
+                            </div>
+                        
+                        </form>
+                       
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bd-example-modal-lg" id="scanBarcode" style=" z-index: 999999999;" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary text-center">
+                    <h5 class="modal-title" id="scanTitle">Scan Tracking No.</h5>
+                    <button type="button" class="close" id="closeScanModal" data-dismiss="modal" data-target="#scanBarcode" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div><br />
+
+                <div class="card shadow mb-4" style="overflow-y:auto !important;">
+                    <div id="reader"></div>
+
+                    @*<center><button type="button" id="btnNib" onclick="NIB()" class="btn btn-danger m-1" data-dismiss="modal">NIB <i class="bi bi-exclamation-triangle-fill"></i></button></center>*@
+                    @*<center><button type="button" id="btnNib" class="btn btn-danger m-1" data-toggle="modal" data-target="#NIBItemModal">NIB <i class="bi bi-exclamation-triangle-fill"></i></button></center>*@
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</section>
+@section Scripts {
+
+
+    <script src="@Url.Content("~/Scripts/DispatchOrder.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/datatables.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/DataTables-1.11.5/js/dataTables.jqueryui.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/vendor/scanbarcode/scanbarcode.js")" type="text/javascript"></script>
+
+    }
+<link href="~/css/user.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/DataTables-1.11.5/css/dataTables.jqueryui.min.css" rel="stylesheet" type="text/css" />
+@*<link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">*@
+<link href="~/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">

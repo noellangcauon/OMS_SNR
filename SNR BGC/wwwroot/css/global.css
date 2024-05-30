@@ -1,0 +1,24 @@
+﻿.color-header {
+    padding: 1rem 1.5rem;
+    margin-bottom: 0;
+    background-color: #44a5f5;
+    border-bottom: 0 solid #ffffff;
+}
+
+table.dataTable.table-striped > tbody > tr.odd.selected {
+    --bs-table-accent-bg: #348cd4;
+}
+
+
+.zoom:hover {
+    -ms-transform: scale(1.2); /* IE 9 */
+    -webkit-transform: scale(1.2); /* Safari 3-8 */
+    transform: scale(1.2);
+}
+
+.disabledReadonly {
+    background-color: #F5F5F5 !important;
+    color: #000000 !important;
+    opacity: .8 !important;
+}
+

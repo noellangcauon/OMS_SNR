@@ -1,0 +1,70 @@
+@media only screen and (min-width: 375px) {
+    .width-notification-s {
+        width: 350px;
+        margin: 21px !important;
+    }
+}
+
+@media only screen and (min-width: 800px) {
+    .width-notification-m {
+        width: 400px;
+        margin: 21px !important;
+    }
+}
+
+.text-notif:after {
+    /*content: "";
+    width: 20px;
+    background-image: radial-gradient(circle at center, red 5px, transparent 5px);
+    display: block !important;*/
+    content: "";
+    position: absolute;
+    height: 50px;
+    width: 20px;
+    top: 5px;
+    background-image: radial-gradient(circle at center, red 4px, transparent 5px);
+    background-size: 23px 23px;
+    background-repeat: no-repeat;
+    left: 13px;
+}
+
+.circle-blue {
+    background-color: #fff;
+    border: 2px solid #348cd4;
+    height: 100px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    width: 100px;
+}
+.circle-red {
+    background-color: #fff;
+    border: 2px solid red;
+    height: 100px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    width: 100px;
+}
+
+.notification-list .notify-item .notify-icon {
+    float: left !important;
+    height: 38px !important;
+    width: 38px !important;
+    font-size: 18px !important;
+    line-height: 36px !important;
+    text-align: center !important;
+    margin-right: 10px !important;
+    border-radius: 50% !important;
+    color: #fff;
+}
+
+
+
+
+
+
+
+
+
+   

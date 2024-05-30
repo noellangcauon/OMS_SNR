@@ -1,0 +1,129 @@
+﻿@{
+    var error = TempData["Error"] as string;
+    Layout = "~/Views/Shared/CodefoxLayout.cshtml";
+}
+
+
+<!-- Content Column -->
+
+<section class="section">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <h3 class="m-0 font-weight-bold text-primary">NOF ITEMS</h3><br />
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+
+                        @* <h3 class="m-0 font-weight-bold text-primary">NOF ITEMS</h3><br />*@
+                        <div class="tab-content pt-2" id="borderedTabJustifiedContent">
+                            <div class="tab-pane fade show active" id="nofItemsDiv" role="tabpanel">
+                                <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="nofItems">
+                                    <thead>
+                                        <tr>
+
+                                            <th style="white-space: nowrap; color: blue;"><input type="checkbox" id="chkAll" /></th>
+                                            <th style="white-space: nowrap; color: blue;">SKU</th>
+                                            <th style="white-space: nowrap; color: blue;">Description</th>
+                                            <th style="white-space: nowrap; color: blue;">Quantity</th>
+                                            <th style="white-space: nowrap; color: blue;">217 Inventory</th>
+                                            <th style="white-space: nowrap; color: blue;">Date Process</th>
+                                            <th style="white-space: nowrap; color: blue;">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="nofItems-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-1">
+                                    <button type="button" id="clearItem" class="btn btn-primary mb-lg-3" data-bs-toggle="tooltip" data-bs-placement="left" data-toggle="modal" data-target="#clearItemModal"> Clear Items</button>
+                                </div>
+                                <div class="col-lg-1" style="margin-left: -28px;">
+                                    <button type="button" id="updateItem" class="btn btn-warning mb-lg-3" data-bs-toggle="tooltip" data-bs-placement="left" data-toggle="modal" data-target="#updateItemModal"> Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<div class="modal fade bd-example-modal-lg" id="clearItemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Clear Item(s)</h5>
+                <button class="close" onclick="cancel()" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Are you sure you want to clear this item(s)?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="cancel()" data-dismiss="modal">Cancel</button>
+                <button id="logout" type="button" onclick="getCheckItems()" class="btn btn-primary" data-dismiss="modal">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="updateItemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Clear Item(s)</h5>
+                <button class="close" onclick="cancel()" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Are you sure you want to update this item(s)?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="cancel()" data-dismiss="modal">Cancel</button>
+                <button id="logout" type="button" onclick="getCheckItemsUpdate()" class="btn btn-primary" data-dismiss="modal">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-example-modal-lg" id="ActivateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Activate User</h5>
+                <button class="close" onclick="cancelActivate()" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Are you sure you want to activate this user?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="cancelActivate()" data-dismiss="modal">Cancel</button>
+                <button id="logout" type="button" onclick="ActivateUser()" class="btn btn-primary" data-dismiss="modal">Activate</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        // Your JavaScript code here
+        var remarksData = @Html.Raw(ViewBag.RemarksData); // Convert ViewBag.RemarksData to a JavaScript variable
+        }
+    </script>
+
+    <script src="@Url.Content("~/Scripts/NOF.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/datatables.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/DataTables-1.11.5/js/dataTables.jqueryui.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/jquery.validate/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/dataTables.buttons.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/buttons.html5.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/pdfmake.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/vfs_fonts.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/JSZip-2.5.0/jszip.min.js")" type="text/javascript"></script>
+
+    }
+<link href="~/css/user.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/DataTables-1.11.5/css/dataTables.jqueryui.min.css" rel="stylesheet" type="text/css" />
+@*<link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">*@
+<link href="~/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">

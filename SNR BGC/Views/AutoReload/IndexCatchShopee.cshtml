@@ -1,0 +1,34 @@
+﻿
+
+@{
+    var error = TempData["Error"] as string;
+    Layout = "~/Views/Shared/_FinalLayout.cshtml";
+}
+
+
+@*<ul class="nav nav-tabs nav-tabs-bordered d-flex mt-lg-3" id="">
+    <li class="nav-item flex-fill">
+        <center id="collctingTab"><div class="nav-link w-100 active" id="lblCollecting">Collecting <i class="bi bi-arrow-up-circle-fill"></i></div></center>
+        <center id="transferringTab" class="d-none"><div class="nav-link w-100 active" id="lblTransferring">Transferring <i class="bi bi-arrow-down-circle-fill"></i></div></center>
+    </li>
+
+</ul>*@
+@*<span id ="modeTransfer">Transferring <i class="bi bi-person-fill-down"></i></span>*@
+
+<center><i class="bi bi-arrow-repeat fa-10x"></i></center>
+<center><h1 class ="text-danger">Automatic Getting Orders</h1></center>
+<center><h1 class="text-danger">CATCH LATE PAYMENTS SHOPEE</h1></center>
+
+
+@section Scripts {
+
+
+    <script src="@Url.Content("~/Scripts/AutoReloadCatchShopee.js")" type="text/javascript"></script>
+
+    }
+<link href="~/css/runner.css" rel="stylesheet" type="text/css" />
+<link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" type="text/css" />0
+<link href="~/lib/dataTables/DataTables-1.11.5/css/dataTables.jqueryui.min.css" rel="stylesheet" type="text/css" />
+@*<link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">*@
+<link href="~/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+

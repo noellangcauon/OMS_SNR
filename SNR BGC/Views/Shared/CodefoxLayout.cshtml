@@ -1,0 +1,299 @@
+﻿@using System.Linq;
+@{
+
+    var claimsIdentity = (System.Security.Claims.ClaimsIdentity)User.Identity;
+
+    var userRole = claimsIdentity.Claims.ToList()[2].Value;
+    var userAccess = claimsIdentity.Claims.ToList()[3].Value;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    @if (userAccess.Contains("Runner"))
+    {
+        <title>OMS Runner</title>
+    }
+    else if (userAccess.Contains("Picker"))
+    {
+        <title>OMS Picker</title>
+    }
+    else if (userAccess.Contains("Boxer"))
+    {
+        <title>OMS Boxer</title>
+    }
+    else if (userAccess.Contains("OMS"))
+    {
+        <title>OMS LazPee</title>
+    }
+
+    <!-- Custom fonts for this template-->
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    @*<link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">*@
+    <link href="~/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/css/loader.css" rel="stylesheet" type="text/css">
+    <link href="~/vendor/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="~/assets/css/bootstrapicons-iconpicker.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+
+    <link href="~/assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables.net-select-bs5/css//select.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/jquery-toast-plugin/jquery.toast.min.css" rel="stylesheet" type="text/css">
+    <link href="~/assets/libs/selectize/css/selectize.bootstrap3.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/quill/quill.snow.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/dropzone/min/dropzone.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
+
+
+    <link href="~/assets/libs/dropify/css/dropify.min.css" rel="stylesheet" type="text/css" />
+
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" id="bs-default-stylesheet" />
+    <link href="~/assets/css/bootstrap-dark.min.css" rel="stylesheet" type="text/css" id="bs-dark-stylesheet" />
+    <link href="~/assets/css/app.css" rel="stylesheet" type="text/css" id="app-default-stylesheet" />
+    <link href="~/assets/css/app-dark.min.css" rel="stylesheet" type="text/css" id="app-dark-stylesheet" />
+    <link href="~/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="~/assets/js/app.min.js"></script>
+    <script src="~/assets/js/app.js"></script>
+
+</head>
+
+<body class="loading" data-layout-mode="horizontal" data-layout='{"mode": "light", "width": "fluid", "menuPosition": "fixed", "topbar": {"color": "light"}, "showRightSidebarOnPageLoad": false}'>
+
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        @await Html.PartialAsync("TopBar")
+        @if (!userAccess.Contains("Runner") && !userAccess.Contains("Picker") && !userAccess.Contains("Boxer"))
+        {
+            @await Html.PartialAsync("TopNavBar")
+        }
+
+
+
+
+
+        <div class="content-page">
+            @RenderBody()
+
+        </div>
+
+
+    </div>
+    <div>
+        <footer class="footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; SNR BGC 2022</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- End of Page Wrapper -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you want to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <form id="logoutForm" asp-area="" asp-controller="Home" asp-action="Logout">
+                        <button id="logout" type="submit" class="btn btn-primary">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Reprint Modal-->
+    <div class="modal fade bd-example-modal-lg" id="reprintModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary text-center">
+                    <h5 class="modal-title" id="exampleModalLabel">Re-print Waybill</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div><br />
+
+                <div class="card shadow mb-4" style="overflow-y:auto !important;">
+                    <div class="card-body">
+
+
+
+                        <div>
+                            @*<input type="number" class="form-control" min="10" max="100" />*@
+                            <div class="row mb-1">
+                                <div class="col-12">
+                                    <span>
+                                        ID
+                                        <input id="txtSupervisorID" type="number" class="form-control">
+                                    </span>
+                                </div>
+
+
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <span>
+                                        PIN
+                                        <input id="txtSupervisorPIN" type="password" inputmode="numeric" pattern="[0-9]*" class="form-control">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    
+                    <button type="button" id="btnSaveLoc" onclick="" class="btn btn-secondary">Send to OM<i class="bi bi-send"></i></button>
+                    <button type="button" id="btnSaveLoc" onclick="RePrintWaybill()" class="btn btn-primary">Print <i class="bi bi-printer"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jsbarcode/JsBarcode.all.min.js" type="text/javascript"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    
+    <script src="~/js/site.js"></script>
+    <script src="~/assets/libs/jquery/jquery.min.js"></script>
+    <script src="~/assets/js/vendor.min.js"></script>
+
+    <script src="~/assets/libs/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
+    @*<script src="~/assets/libs/datatables.net/js/jquery.dataTables.min.js"></script>*@
+    <script src="~/assets/libs/inputmask/jquery.inputmask.min.js"></script>
+    <script src="~/assets/libs/numeral-js/numeral.min.js"></script>
+    @*<script src="~/assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>*@
+    <script src="~/assets/js/vendor.min.js"></script>
+    <script src="~/assets/libs/moment/moment.js"></script>
+    <script src="~/assets/libs/moment-countdown/countdown.min.js"></script>
+    <script src="~/assets/libs/moment-countdown/moment-countdown.min.js"></script>
+    <script src="~/assets/libs/flatpickr/flatpickr.min.js"></script>
+    <script src="~/assets/js/bootstrapicon-iconpicker.js"></script>
+    <script src="~/assets/libs/jquery-knob/jquery.knob.min.js"></script>
+    @*<script src="~/assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js"></script>*@
+    @*<script src="~/assets/libs/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js"></script>*@
+    @*    <script src="~/assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/assets/libs/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js"></script>*@
+    @*<script src="~/assets/libs/datatables.net-buttons/js/buttons.html5.min.js"></script>*@
+    @*<script src="~/assets/libs/datatables.net-buttons/js/buttons.flash.min.js"></script>*@
+    @*<script src="~/assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>*@
+    @*<script src="~/assets/libs/datatables.net-select/js/dataTables.select.min.js"></script>*@
+    <script src="~/assets/libs/twitter-bootstrap-wizard/jquery.bootstrap.wizard.min.js"></script>
+    <script src="~/assets/libs/selectize/js/standalone/selectize.min.js"></script>
+    <script src="~/assets/libs/twitter-bootstrap-wizard/jquery.bootstrap.wizard.min.js"></script>
+    <script src="~/assets/libs/apexcharts/apexcharts.min.js"></script>
+    <script src="~/assets/libs/morris.js06/morris.min.js"></script>
+    <script src="~/assets/libs/jquery-mask-plugin/jquery.mask.min.js"></script>
+    <script src="~/assets/libs/autonumeric/autoNumeric.min.js"></script>
+    <script src="~/assets/libs/dropzone/min/dropzone.min.js"></script>
+    <script src="~/assets/libs/dropify/js/dropify.min.js"></script>
+    <script src="~/assets/js/pages/form-fileuploads.init.js"></script>
+    @*<script src="~/js/SignalR/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/SignalR/signalscript.js"></script>*@
+    <script src="~/assets/libs/quill/quill.min.js"></script>
+    <script src="~/assets/libs/jquery-toast-plugin/jquery.toast.min.js"></script>
+    @*<script src="~/assets/js/pages/form-masks.init.js"></script>*@
+    @*added by jetaro*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"
+            integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+
+    <!-- App js-->
+    @*<script src="~/assets/js"></script>*@
+    <script src="~/assets/js/app.min.js"></script>
+
+
+    <!-- Custom scripts for all pages-->
+    @*    <script src="~/js/sb-admin-2.min.js"></script>
+    <script src="~/js1/jquery-ui.min.js"></script>*@
+    @*<script src="~/js1/jquery-3.6.0.js"></script>*@
+
+    <!-- Page level plugins -->
+    @*  <script src="~/vendor/chart.js/Chart.min.js"></script>*@
+
+    <!-- Page level custom scripts -->
+    @*<script src="@Url.Content("~/Scripts/Token.js")" type="text/javascript"></script>*@
+    @*   <script src="~/js/demo/chart-area-demo.js"></script>
+    <script src="~/js/demo/chart-pie-demo.js"></script>*@
+
+    <script src="~/js1/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
+    <style>
+        .swal2-container {
+            z-index: 999999999;
+        }
+
+    </style>
+</body>
+
+
+
+
+</html>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+
+<script>
+    $.ajax({
+            url: `/DiscrepancyCenter/GetDiscrepancyCount`,
+            type: 'GET',
+
+            success: function (data) {
+                $.each(data, function (count, item) {
+
+                    $('#spanCount').text(item.boxId)
+                })
+
+                console.log(data);
+
+
+
+            }
+        });
+</script>
+

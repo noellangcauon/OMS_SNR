@@ -1,0 +1,1023 @@
+﻿@{
+
+    
+    var claimsIdentity = (System.Security.Claims.ClaimsIdentity)User.Identity;
+
+    var userRole = claimsIdentity.Claims.ToList()[2].Value;
+    var userAccess = claimsIdentity.Claims.ToList()[3].Value;
+
+    if (userAccess.Contains("Boxer") || userAccess.Contains("Runner") || userAccess.Contains("Picker"))
+    {
+        Layout = "~/Views/Shared/_FinalLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/CodefoxLayout.cshtml";
+    }
+
+}
+<script src="https://kit.fontawesome.com/d2706bb394.js" crossorigin="anonymous"></script>
+
+@if (userAccess.Contains("OMS"))
+
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div>
+                                <h4 class="page-title">Dashboard</h4>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-tabs nav-bordered mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a href="#home" data-bs-toggle="tab" aria-expanded="false" class="nav-link active" aria-selected="true" role="tab">
+                            <i class="mdi mdi-home-variant d-md-none d-block"></i>
+                            <span class="d-none d-md-block">Orders Details</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="#profile" data-bs-toggle="tab" aria-expanded="true" class="nav-link" aria-selected="false" role="tab" tabindex="-1">
+                            <i class="mdi mdi-account-circle d-md-none d-block"></i>
+                            <span class="d-none d-md-block">Average Time</span>
+                        </a>
+                    </li>
+                   
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane active show" id="home" role="tabpanel">
+                   <div class="card card-primary card-outline">
+            <div class="card-body">
+                
+
+                <div class="row">
+                    
+                    <div class="card shadow-none">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    
+
+                                    <div class="col-md-6 text-align:center align-items-md-center">
+                                        <label> Date From </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input class="form-control flatpickr lazadaDate" id="dateFrom" type="date" />
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-6 text-align:center align-items-md-center">
+                                        <label> Date To </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input class="form-control flatpickr lazadaDate" id="dateTo" type="date" />
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                   
+                </div>
+                <div class="row">
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-purple shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-layers font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="waitingOrder">0</span></h2>
+                                            
+                                             <button type="button" id="viewWaitingOrder" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                  Pending Orders
+                                             </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-soft-dark shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-archive font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="waitingToCollect">0</span></h2>
+                                            
+                                            <button type="button" id="viewWaitingToCollect" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                Waiting to collect Orders
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-pink shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-shuffle font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="waitingToPick">0</span></h2>
+                                           
+                                            <button type="button" id="viewWaitingToPick" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                 Waiting to pick Orders
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-success shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-package font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="pickOrders">0</span></h2>
+                                            
+                                             <button type="button" id="viewPickOrders" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                 Currently Picking
+                                             </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-warning shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-truck font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="boxOrders">0</span></h2>
+                                          
+                                             <button type="button" id="viewBoxOrders" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                 For Packing Orders
+                                             </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-info shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-shopping-cart font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="toShipOrders">0</span></h2>
+                                            
+                                             <button type="button" id="viewToShipOrders" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                 Ready To Ship Orders
+                                             </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-secondary shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-alert-octagon font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="notOnFulfillment">0</span></h2>
+                                           
+                                             <button type="button" id="viewNOFOrders" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                  NOF 
+                                             </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget-rounded-circle card bg-danger shadow-none">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="avatar-lg rounded-circle bg-soft-light">
+                                            <i class="fe-x-square font-28 avatar-title text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-end">
+                                            <h2 class="text-white mt-2"><span data-plugin="counterup" id="outOfStock">0</span></h2>
+                                           
+                                             <button type="button" id="viewOutOfStockOrders" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                  Out of Stock Orders 
+                                             </button>
+                                        </div>
+                                    </div>
+                                </div> <!-- end row-->
+                            </div>
+                        </div> <!-- end widget-rounded-circle-->
+                    </div> <!-- end col-->
+                   
+                
+               
+                    
+                   
+                </div>
+                            <div class="row">
+
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="widget-rounded-circle card bg-soft-dark shadow-none">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="avatar-lg rounded-circle bg-soft-light">
+                                                        <i class="fe-inbox font-28 avatar-title text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="text-end">
+                                                        <h2 class="text-white mt-2"><span data-plugin="counterup"></span></h2>
+                                                        <p class="text-white mb-0 text-truncate">Order Items</p>
+                                                        <button type="button" id="viewItems" class="btn btn-link rounded-pill waves-effect">View Details</button>
+
+                                                    </div>
+                                                </div>
+                                            </div> <!-- end row-->
+                                        </div>
+                                    </div> <!-- end widget-rounded-circle-->
+                                </div> <!-- end col-->
+
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="widget-rounded-circle card bg-primary shadow-none">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="avatar-lg rounded-circle bg-soft-light">
+                                                        <i class="fe-watch font-28 avatar-title text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="text-end">
+                                                        <h2 class="text-white mt-2"><span data-plugin="counterup" id="averageOrdersPerHour">0</span></h2>
+                                                        <button type="button" id="viewOrdersPerHour" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                            Average Order Per Hour
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div> <!-- end row-->
+                                        </div>
+                                    </div> <!-- end widget-rounded-circle-->
+                                </div> <!-- end col-->
+
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="widget-rounded-circle card bg-purple shadow-none">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="avatar-lg rounded-circle bg-soft-light">
+                                                        <i class="fe-truck font-28 avatar-title text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="text-end">
+                                                        <h2 class="text-white mt-2"><span data-plugin="counterup" id="courierPicked">0</span></h2>
+
+                                                        <button type="button" id="viewCourierPicked" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                            Dispatched
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div> <!-- end row-->
+                                        </div>
+                                    </div> <!-- end widget-rounded-circle-->
+                                </div> <!-- end col-->
+
+
+                            </div>
+
+
+
+                        </div>
+        </div>
+                </div>
+                <div class="tab-pane" id="profile" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6 col-xl-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="text-center" dir="ltr">
+                                        <h5>Average Picking Time Per Item</h5>
+
+                                        <div style="display:inline;width:150px;height:150px;">
+
+                                            <input readonly="readonly" disabled id="txtPickTimePerItem" data-plugin="knob" data-width="150" data-height="150" data-min="-100" data-bgcolor="rgba(150, 150, 150, 0.1)" data-fgcolor="#675aa9" data-displayprevious="true" data-angleoffset="-125" data-anglearc="250" value="44" style="width: 79px; height: 50px; position: absolute; vertical-align: middle; margin-top: 50px; margin-left: -114px; border: 0px; background: none; font: bold 30px Arial; text-align: center; color: rgb(103, 90, 169); padding: 0px; appearance: none;">
+                                        </div>
+                                        <h4 class="mb-3"> Minutes</h4>
+
+                                    </div> <!-- end .text-center -->
+                                </div>
+                            </div> <!-- end card -->
+                        </div>
+
+                        <div class="col-md-6 col-xl-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="text-center" dir="ltr">
+                                        <h5>Average Picking Time Per JO</h5>
+
+                                        <div style="display:inline;width:150px;height:150px;">
+
+                                            <input readonly="readonly" disabled id="txtPickTimePerJO" data-plugin="knob" data-width="150" data-height="150" data-min="-100" data-bgcolor="rgba(150, 150, 150, 0.1)" data-fgcolor="#50C878" data-displayprevious="true" data-angleoffset="-125" data-anglearc="250" value="60" style="width: 79px; height: 50px; position: absolute; vertical-align: middle; margin-top: 50px; margin-left: -114px; border: 0px; background: none; font: bold 30px Arial; text-align: center; color: rgb(103, 90, 169); padding: 0px; appearance: none;">
+                                        </div>
+                                        <h4 class="mb-3"> Minutes</h4>
+
+                                    </div> <!-- end .text-center -->
+                                </div>
+                            </div> <!-- end card -->
+                        </div>
+
+                        <div class="col-md-6 col-xl-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="text-center" dir="ltr">
+                                        <h5>Average Packing Time Per Item</h5>
+
+                                        <div style="display:inline;width:150px;height:150px;">
+
+                                            <input readonly="readonly" disabled id="txtPackTimePerItem" data-plugin="knob" data-width="150" data-height="150" data-min="-100" data-bgcolor="rgba(150, 150, 150, 0.1)" data-fgcolor="#0096FF" data-displayprevious="true" data-angleoffset="-125" data-anglearc="250" value="44" style="width: 79px; height: 50px; position: absolute; vertical-align: middle; margin-top: 50px; margin-left: -114px; border: 0px; background: none; font: bold 30px Arial; text-align: center; color: rgb(103, 90, 169); padding: 0px; appearance: none;">
+                                        </div>
+                                        <h4 class="mb-3"> Minutes</h4>
+
+                                    </div> <!-- end .text-center -->
+                                </div>
+                            </div> <!-- end card -->
+                        </div>
+
+                        <div class="col-md-6 col-xl-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="text-center" dir="ltr">
+                                        <h5>Average Packing Time Per JO</h5>
+
+                                        <div style="display:inline;width:150px;height:150px;">
+
+                                            <input readonly="readonly" disabled id="txtPackTimePerJO" data-plugin="knob" data-width="150" data-height="150" data-min="-100" data-bgcolor="rgba(150, 150, 150, 0.1)" data-fgcolor="#FF5733" data-displayprevious="true" data-angleoffset="-125" data-anglearc="250" value="44" style="width: 79px; height: 50px; position: absolute; vertical-align: middle; margin-top: 50px; margin-left: -114px; border: 0px; background: none; font: bold 30px Arial; text-align: center; color: rgb(103, 90, 169); padding: 0px; appearance: none;">
+                                        </div>
+                                        <h4 class="mb-3"> Minutes</h4>
+
+                                    </div> <!-- end .text-center -->
+                                </div>
+                            </div> <!-- end card -->
+                        </div>
+
+
+
+
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-primary card-outline">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="row">
+                                                <div class="card shadow-none">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5>
+                                                                Top 5 Picker Per Item
+                                                            </h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+
+                                                            <h5 style="text-align:end" id="">
+                                                                <button type="button" id="viewPicker" class="btn btn-link rounded-pill waves-effect">View All Picker</button>
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm text-sm nowrap w-100 table-hover" id="tblTop5PickerPerItem">
+
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="white-space: nowrap;">#</th>
+                                                    <th style="white-space: nowrap;">User Id</th>
+                                                    <th style="white-space: nowrap;">Fullname</th>
+                                                    <th style="white-space: nowrap;">Total Minutes</th>
+                                                    <th style="white-space: nowrap;">Number of Item</th>
+                                                    <th style="white-space: nowrap;">Number of JO</th>
+                                                    <th style="white-space: nowrap;">Average Minute</th>
+
+
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                                    </div>
+
+
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card card-primary card-outline">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="row">
+                                                <div class="card shadow-none">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5>
+                                                                Top 5 Picker Per JO
+                                                            </h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+
+                                                            <h5 style="text-align:end" id="">
+                                                                <button type="button" id="viewPickerPerJO" class="btn btn-link rounded-pill waves-effect">View All Picker</button>
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm text-sm nowrap w-100 table-hover" id="tblTop5PickerPerJO">
+
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="white-space: nowrap;">#</th>
+                                                    <th style="white-space: nowrap;">User Id</th>
+                                                    <th style="white-space: nowrap;">Fullname</th>
+                                                    <th style="white-space: nowrap;">Total Minutes</th>
+                                                    <th style="white-space: nowrap;">Number of Item</th>
+                                                    <th style="white-space: nowrap;">Number of JO</th>
+                                                    <th style="white-space: nowrap;">Average Minute</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-primary card-outline">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="row">
+                                                <div class="card shadow-none">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5>
+                                                                Top 5 Packer Per Item
+                                                            </h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+
+                                                            <h5 style="text-align:end" id="">
+                                                                <button type="button" id="viewPackerPerItem" class="btn btn-link rounded-pill waves-effect">View All Packer</button>
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm text-sm nowrap w-100 table-hover" id="tblTop5PackerPerItem">
+
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="white-space: nowrap;">#</th>
+                                                    <th style="white-space: nowrap;">User Id</th>
+                                                    <th style="white-space: nowrap;">Fullname</th>
+                                                    <th style="white-space: nowrap;">Total Minutes</th>
+                                                    <th style="white-space: nowrap;">Number of Item</th>
+                                                    <th style="white-space: nowrap;">Number of JO</th>
+                                                    <th style="white-space: nowrap;">Average Minute</th>
+
+
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                                    </div>
+
+
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card card-primary card-outline">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="row">
+                                            <div class="row">
+                                                <div class="card shadow-none">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5>
+                                                                Top 5 Packer Per JO
+                                                            </h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+
+                                                            <h5 style="text-align:end" id="">
+                                                                <button type="button" id="viewPackerPerJO" class="btn btn-link rounded-pill waves-effect">View All Packer</button>
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm text-sm nowrap w-100 table-hover" id="tblTop5PackerPerJO">
+
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="white-space: nowrap;">#</th>
+                                                    <th style="white-space: nowrap;">User Id</th>
+                                                    <th style="white-space: nowrap;">Fullname</th>
+                                                    <th style="white-space: nowrap;">Total Minutes</th>
+                                                    <th style="white-space: nowrap;">Number of Item</th>
+                                                    <th style="white-space: nowrap;">Number of JO</th>
+                                                    <th style="white-space: nowrap;">Average Minute</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+
+
+        <!-- end page title -->
+        
+      
+        
+
+        
+    </div>
+
+    <div class="modal fade bd-example-modal-lg" id="pickerAvgTable" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="width:150%;">
+                <div class="modal-header modal-colored-header bg-primary text-center">
+                    <h3 class="modal-title" style="color:white" id="perPickerHeader">Picker Details</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="listOfPicker">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="white-space: nowrap;">#</th>
+                                    <th style="white-space: nowrap;">User Id</th>
+                                    <th style="white-space: nowrap;">Fullname</th>
+                                    <th style="white-space: nowrap;">Total Minutes</th>
+                                    <th style="white-space: nowrap;">Number of Item</th>
+                                     <th style="white-space: nowrap;">Number of JO</th>
+                                    <th style="white-space: nowrap;">Average Minute</th>
+
+
+
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-roles">
+                               
+                            </tbody>
+                        </table>
+                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bd-example-modal-lg" id="listItemModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="width:180%;">
+                <div class="modal-header modal-colored-header bg-primary text-center">
+                    <h3 class="modal-title" style="color:white">Item Details</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                       
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                            <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="listOfitem">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="white-space: nowrap; text-align:center">SKU</th>
+                                    <th style="white-space: nowrap; text-align:center">Item Image</th>
+                                    <th style="white-space: nowrap; text-align:center">Item Description</th>
+                                    <th style="white-space: nowrap; text-align:center">Order Qty</th>
+                                    <th style="white-space: nowrap; text-align:center">Inventory Qty</th>
+
+
+
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-roles">
+                            </tbody>
+                        </table>
+                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                    </div>
+                </div>
+               @* <div class="card shadow mb-4" style="overflow-y:auto !important;">
+
+                    <div class="card-body">
+                        <div class="row">
+
+
+                            <div class="col-md-12">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+
+                                        <table class="sortable table table-bordered table-responsive-md table-hover" id="listOfitem" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th style="white-space: nowrap; text-align:center">SKU</th>
+                                                    <th style="white-space: nowrap; text-align:center">Item Image</th>
+                                                    <th style="white-space: nowrap; text-align:center">Item Description</th>
+                                                    <th style="white-space: nowrap; text-align:center">Order Qty</th>
+                                                    <th style="white-space: nowrap; text-align:center">Inventory Qty</th>
+
+
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>*@
+
+              
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-m" id="orderPerHourModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-m" role="document">
+            <div class="modal-content" style="width:150%;">
+                <div class="modal-header modal-colored-header bg-primary text-center">
+                    <h3 class="modal-title" style="color:white" id="orderPerHourHeader">Order Per Hour</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="tblOrderPerHour">
+                            <thead class="table-light">
+                                <tr>
+                                   
+                                    <th style="white-space: nowrap;">Hour</th>
+                                    <th style="white-space: nowrap;">Lazada</th>
+                                    <th style="white-space: nowrap;">Shopee</th>
+                                   
+
+
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-roles">
+                            </tbody>
+
+                        </table>
+                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-lg" id="orderItemModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="width:180%;">
+                <div class="modal-header modal-colored-header bg-primary text-center">
+                    <h3 class="modal-title" style="color:white">Item Details</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="tblOrderItem">
+                            <thead class="table-light">
+                                <tr>
+                                     <th style="white-space: nowrap;">#</th>
+                                    <th style="white-space: nowrap;">ORDER ID</th>
+                                    <th style="white-space: nowrap;">ORDER DATE</th>
+                                    <th style="white-space: nowrap;">TOTAL ITEMS</th>
+                                   
+                                    <th style="white-space: nowrap;">TOTAL AMOUNT</th>
+                                   
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-roles">
+                            </tbody>
+
+                        </table>
+                        @*<table class="table table-sm text-sm nowrap table-bordered" id="header-fixed"></table>*@
+                    </div>
+                </div>
+                
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="itemModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="itemModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="overlay" id="addedit-modal-overlay" hidden>
+                    <span class='spinner-border spinner-border-md'></span>
+                </div>
+                <div class="modal-header bg-primary border-bottom">
+                    <h4 class="modal-title" id="addedit-modalLabel" style="color:white">Order Details</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="card-header py-3">
+
+                    <span id="itemsOrderIdHeaderShopee" style="display:none"></span>
+                    <h5 class="m-0 font-weight-bold text-primary" id="itemsShopeeTxtHeader"></h5>
+                    <h5 class="m-0 font-weight-bold text-primary" id="customerShopeeTxtHeader"></h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="sortable table table-bordered table-responsive-md table-hover" id="listOfItems" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th style="white-space: nowrap;">SKU</th>
+                                        <th style="white-space: nowrap;">Item Image</th>
+                                        <th style="white-space: nowrap;">Item Name</th>
+                                        @*<th>Quantity</th>*@
+                                        <th style="white-space: nowrap;">Order Date</th>
+                                        <th>Exception</th>
+                                        <th style="white-space: nowrap;">Barcode</th>
+                                        <th>Price</th>
+
+                                        @*<th style="white-space: nowrap;">Total Amount</th>*@
+                                        @*<th></th>*@
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="text-right" style="font-size: 22px;font-weight: 800;">
+                                        <td colspan="6">Grand Total: </td>
+                                        <td colspan="1" style="text-align: center;color:red;" id="trn_grand_total">₱<span id="txtTotalPrice"></span></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+}
+
+@if (userAccess.Contains("Boxer"))
+{
+
+    <div style="margin-top: 10%; margin-bottom: 50%">
+        <center>
+            <h1>SCAN</h1>
+            <button id="btnQRScan" class="btn btn-primary" onclick="ScanQRForOrders()"><h1 class="mb-0" style="font-size:400%;"><i class="bi bi-qr-code-scan"></i></h1></button>
+        </center>
+        <center>
+            <br />
+            <h3>or</h3>
+            <br />
+
+            <h3>Enter QR code</h3>
+            <div class="input-group">
+                <input name="" id="txtQrCodes" class="form-control" />
+
+                <div class="input-group-append  hover-effect">
+                    <button class="btn btn-success" id="btnSend" onclick="SubmitOrderNumber()"><i class="bi bi-send"></i></button>
+                </div>
+            </div>
+        </center>
+    </div>
+
+    <button type="button" class="btn btn-primary" id="scanBarcodeBtn" style="display:none;" data-toggle="modal" data-target="#scanBarcode"></button>
+    <div class="modal fade bd-example-modal-lg" id="scanBarcode" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary text-center">
+                    <h5 class="modal-title">Scan QR</h5>
+                    <button type="button" class="close" id="closeScanModal" data-dismiss="modal" data-target="#scanBarcode" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div><br />
+
+                <div class="card shadow mb-4" style="overflow-y:auto !important;">
+                    <div id="reader"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="scanBarcodePrinterBtn" style="display:none;" data-toggle="modal" data-target="#scanBarcodePrinter"></button>
+    <div class="modal fade bd-example-modal-lg" id="scanBarcodePrinter" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary text-center">
+                    <h5 class="modal-title">Scan QR</h5>
+                    <button type="button" class="close" id="closeScanPrinterModal" data-dismiss="modal" data-target="#scanBarcode" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div><br />
+
+                <div class="card shadow mb-4" style="overflow-y:auto !important;">
+                    <div id="readerPrinter"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+else if (userAccess.Contains("Runner") || userAccess.Contains("Picker"))
+{
+    <div style="margin: 500px;">
+    </div>
+}
+
+<div id="divChartDashboard" data-request-url="@Url.Action("GetDataChart", "Home")"></div>
+
+
+@section Scripts {
+    <!-- Page level custom scripts -->
+    <script src="@Url.Content("~/vendor/scanbarcode/scanbarcode.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/Home.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/datatables.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/DataTables-1.11.5/js/dataTables.jqueryui.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/dataTables.buttons.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/Buttons-2.2.2/js/buttons.html5.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/pdfmake.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/pdfmake-0.1.36/vfs_fonts.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/lib/dataTables/JSZip-2.5.0/jszip.min.js")" type="text/javascript"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    
+
+    @*<script src="~/Scripts/DashboardHub.js"></script>
+*@
+   
+}
+ <link href="~/css/boxer.css" rel="stylesheet" type="text/css" />
+    <link href="~/lib/dataTables/datatables.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/lib/dataTables/DataTables-1.11.5/css/dataTables.jqueryui.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/datatable.css" rel="stylesheet" type="text/css" />
+
