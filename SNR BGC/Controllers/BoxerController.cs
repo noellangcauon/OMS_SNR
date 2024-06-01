@@ -1170,18 +1170,7 @@ namespace SNR_BGC.Controllers
                         }
 
                     }
-
-
-
-
-
-
                     //test
-
-
-
-
-
                 }
                 else if (module == "shopee")
                 {
@@ -1206,49 +1195,11 @@ namespace SNR_BGC.Controllers
                                 }
                             }
 
+                            string trackingNo = await GetShopeeTrackingNo(access_token.ToString(), orderId);
                             if (isAlreadyPack)
                             {
 
-                                var partnerKey2 = _configuration["Infrastructure:ShopeeApi:v2:PartnerKey"] ?? "";
-
-                                string sqld2 = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='{shopId}', @ShopeeShopID='{shopId}', @PrinterName='{result}',@Token='{access_token.ToString()}', @PartnerKey='{partnerKey2}'";
-                                using var cmdd2 = new SqlCommand(sqld2, connsd);
-                                result_clear = (cmdd2.ExecuteScalar()).ToString();
-
-
-
-                                string apiUrl2 = string.Empty;
-
-                                var printerExe = new printerExeClass();
-                                printerExe = _userInfoConn.printerExe.Where(e => e.printer == result && e.platform == module).FirstOrDefault();
-
-                                apiUrl2 = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&accessToken={access_token.ToString()}&partnerKey={partnerKey2}&partnerId={partnerId}&shopId={shopId}&filepath={printerExe.filepath}";
-
-
-
-                                using (HttpClient client = new HttpClient())
-                                {
-                                    // Make a GET request
-                                    HttpResponseMessage response = await client.GetAsync(apiUrl2);
-
-                                    if (response.IsSuccessStatusCode)
-                                    {
-                                        // Read and display the response content
-                                        string content = await response.Content.ReadAsStringAsync();
-                                        Console.WriteLine(content);
-
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine($"Error: {response.StatusCode}");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                string trackingNo = await GetShopeeTrackingNo(access_token.ToString(), orderId);
-
-                                if (trackingNo != null && trackingNo != "")
+                                if (!string.IsNullOrEmpty(trackingNo) && !string.IsNullOrWhiteSpace(trackingNo))
                                 {
                                     var partnerKey2 = _configuration["Infrastructure:ShopeeApi:v2:PartnerKey"] ?? "";
 
@@ -1289,7 +1240,55 @@ namespace SNR_BGC.Controllers
                                 {
                                     return Json(new
                                     {
-                                        set = "Failed"
+                                        set = "TrackingNumberNotFound"
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                //if (trackingNo != null && trackingNo != "")
+                                if (!string.IsNullOrEmpty(trackingNo) && !string.IsNullOrWhiteSpace(trackingNo))
+                                {
+                                    var partnerKey2 = _configuration["Infrastructure:ShopeeApi:v2:PartnerKey"] ?? "";
+
+                                    string sqld2 = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='{shopId}', @ShopeeShopID='{shopId}', @PrinterName='{result}',@Token='{access_token.ToString()}', @PartnerKey='{partnerKey2}'";
+                                    using var cmdd2 = new SqlCommand(sqld2, connsd);
+                                    result_clear = (cmdd2.ExecuteScalar()).ToString();
+
+
+
+                                    string apiUrl2 = string.Empty;
+
+                                    var printerExe = new printerExeClass();
+                                    printerExe = _userInfoConn.printerExe.Where(e => e.printer == result && e.platform == module).FirstOrDefault();
+
+                                    apiUrl2 = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&accessToken={access_token.ToString()}&partnerKey={partnerKey2}&partnerId={partnerId}&shopId={shopId}&filepath={printerExe.filepath}";
+
+
+
+                                    using (HttpClient client = new HttpClient())
+                                    {
+                                        // Make a GET request
+                                        HttpResponseMessage response = await client.GetAsync(apiUrl2);
+
+                                        if (response.IsSuccessStatusCode)
+                                        {
+                                            // Read and display the response content
+                                            string content = await response.Content.ReadAsStringAsync();
+                                            Console.WriteLine(content);
+
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine($"Error: {response.StatusCode}");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    return Json(new
+                                    {
+                                        set = "TrackingNumberNotFound"
                                     });
                                 }
                             }
@@ -1319,7 +1318,7 @@ namespace SNR_BGC.Controllers
 
 
                 var partnerKey = _configuration["Infrastructure:ShopeeApi:v2:PartnerKey"] ?? "";
-
+                
                 string sqld = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='{shopId}', @ShopeeShopID='{shopId}', @PrinterName='{result}',@Token='{access_token.ToString()}', @PartnerKey='{partnerKey}'";
                 using var cmdd = new SqlCommand(sqld, connsd);
                 result_clear = (cmdd.ExecuteScalar()).ToString();
@@ -1436,15 +1435,30 @@ namespace SNR_BGC.Controllers
             }
             catch (Exception ex)
             {
+                var boxerLogs = new BoxerLogs();
+                boxerLogs.orderId = orderId;
+                boxerLogs.logs = "DoneBoxer Exception: " + ex.Message;
+                boxerLogs.dateProcess = DateTime.Now;
+                boxerLogs.printername = result;
+                boxerLogs.module = "";
+                boxerLogs.response = "";
+                boxerLogs.partnerId = "";
+                boxerLogs.shopId = "";
+                boxerLogs.access_token = "";
+                boxerLogs.partnerKey = "";
+                boxerLogs.filepath = "";
+                _userInfoConn.Add(boxerLogs);
+                _userInfoConn.SaveChanges();
+
                 return Json(new
                 {
                     set = "Exception"
                 });
-
+                
             }
 
 
-            
+
         }
         
 

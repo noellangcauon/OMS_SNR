@@ -499,6 +499,16 @@ function ScanQRPrinter() {
                         confirmButtonText: 'OK'
                     })
                 }
+                else if (set.set == "TrackingNumberNotFound") {
+                    ajaxLoader('hide');
+
+                    Swal.fire({
+                        title: 'Oops!',
+                        text: 'Tracking No. not found. Please retry to proceed',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
             });
 
         }

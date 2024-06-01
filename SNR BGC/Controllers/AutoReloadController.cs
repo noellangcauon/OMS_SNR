@@ -6010,8 +6010,8 @@ namespace SNR_BGC.Controllers
                 requestCanceled.AddApiParameter("limit", "100");
                 requestCanceled.AddApiParameter("sort_by", "updated_at");
                 /*request.AddApiParameter("created_after", finalDateFrom);*/
-                requestCanceled.AddApiParameter("created_after", dateFromCancelled.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszz00"));
-                requestCanceled.AddApiParameter("created_before", dateTo.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszz00"));
+                requestCanceled.AddApiParameter("update_after", dateFromCancelled.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszz00"));
+                requestCanceled.AddApiParameter("update_before", dateTo.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'sszz00"));
                 requestCanceled.AddApiParameter("status", "canceled");
                 LazopResponse responseCanceled = clientCanceled.Execute(requestCanceled, accessToken);
                 objCanceled = responseCanceled.Body;
