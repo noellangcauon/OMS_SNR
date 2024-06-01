@@ -775,8 +775,9 @@ namespace SNR_BGC.Controllers
             return Json(new { set = result_clear });
         }
 
-        public async Task<JsonResult> DoneBoxer(CancellationToken stoppingToken, string orderId, string result)
+        public async Task<JsonResult> DoneBoxer(CancellationToken stoppingToken, string orderId, string result, int retryCount = 0)
         {
+            const int MaxRetries = 3;
             try
             {
                 var boxerLogs = new BoxerLogs();
@@ -1450,15 +1451,22 @@ namespace SNR_BGC.Controllers
                 _userInfoConn.Add(boxerLogs);
                 _userInfoConn.SaveChanges();
 
-                return Json(new
+                if (retryCount < MaxRetries)
                 {
-                    set = "Exception"
-                });
-                
+                    retryCount++;
+                    await Task.Delay(3000);
+
+                    return await DoneBoxer(stoppingToken, orderId, result, retryCount);
+                }
+                else
+                {
+                    // Max retries reached, handle accordingly
+                    return Json(new
+                    {
+                        set = "Exception"
+                    });
+                }
             }
-
-
-
         }
         
 
