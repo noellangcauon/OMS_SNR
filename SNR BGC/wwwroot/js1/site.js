@@ -16,6 +16,19 @@
  *  PARAMETERS    : 
  #######################################################################
  */
+
+var retryCount = 0;
+
+function updateRetryMessage() {
+	retryCount++;
+	var messageElement = document.getElementById('retry-message');
+	messageElement.textContent = "Retrying... (" + retryCount + ")";
+}
+
+function retryCountReset() {
+	retryCount = 0;
+}
+
 function ajaxLoader(type, label) {
 	if (label == undefined) { label = 'Processing Information'; }
 	if (type == 'show') {
@@ -41,6 +54,35 @@ function ajaxLoader(type, label) {
 	/*	$('img[src="images/loader.gif"]').each(function () {
 			$(this).remove();
 		});*/
+	}
+}
+
+
+function ajaxLoaderRetry(type, label) {
+	if (label == undefined) { label = 'Loading...'; }
+	if (type == 'show') {
+
+		$('body').css({ 'cursor': 'progress' });
+		var h = innerHeight / 2;
+		var hhalf = h - 70;
+		var w = innerWidth / 2;
+		var whalf = w - 90;
+		var msg = "<center><div class='loading' style='width: 180px; padding: 20px;'><p id='retry-message' style='padding: 20px; background-color: white; z-index: 9999; position: absolute; border-radius: 50px; margin-top: 30px;'>Please wait...</p></div></center>";
+		$("#processMsg").remove();
+		$("body").append("<center><div style='width:100%; height:100%;' id='processMsg' style='' class='label'>" + msg + "<div class='ui-widget-overlay' style='z-index:145;'  ></div></div></center>");
+	} else {
+
+		$('body').css({ 'cursor': 'default' });
+
+		/* Remove all instances of the ajaxLoaderRetry box */
+		$('#processMsg').each(function () {
+			$(this).remove();
+		});
+
+		/* Remove any stray ajax-loader image, if any */
+		/*	$('img[src="images/loader.gif"]').each(function () {
+				$(this).remove();
+			});*/
 	}
 }
 /*

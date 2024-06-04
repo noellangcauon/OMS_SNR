@@ -392,85 +392,56 @@ function ScanQRPrinter() {
         $("#closeScanModal").click();
         //$("#itemModalBtn").click();
 
-        ajaxLoader('show');
+        ajaxLoaderRetry('show');
         if (result.toLowerCase().match(/^wp/)) {
-            $.ajax({
-                type: "POST",
-                url: "/Boxer/DoneBoxer?orderId=" + orderId + "&result=" + result,
-            }).done(function (set) {
-                if (set.set == 'Done') {
-                    $("#closeScanQRPrinter").click();
+            callDoneBoxer(result);
+        }
+        else {
+            $("#closeScanQRPrinter").click();
+            Swal.fire({
+                title: 'Oops!',
+                text: 'The Printer QR Code must have WP in text!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            })
+        }
+    }
 
-                    ajaxLoader('hide');
+    function callDoneBoxer(result, retries = 3) {
+        $.ajax({
+            type: "POST",
+            url: "/Boxer/DoneBoxer?orderId=" + orderId + "&result=" + result,
+        }).done(function (set) {
+            if (set.set == 'Done') {
+                $("#closeScanQRPrinter").click();
+
+                ajaxLoaderRetry('hide');
 
 
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'The order is successfully completed!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                })
+
+                var si = setInterval(function () {
+                    clearInterval(si);
+                    document.location = '/'
+                }, 1000);
+
+                retryCountReset();
+            }
+
+            else if (set.set == 'Failed') {
+                $("#closeScanQRPrinter").click();
+
+                ajaxLoaderRetry('hide');
+
+                if (set.hasSystemError == 'SystemError') {
                     Swal.fire({
-                        title: 'Success!',
-                        text: 'The order is successfully completed!',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    })
-
-                    var si = setInterval(function () {
-                        clearInterval(si);
-                        document.location = '/'
-                    }, 1000);
-
-                }
-
-                else if (set.set == 'Failed') {
-                    $("#closeScanQRPrinter").click();
-
-                    ajaxLoader('hide');
-
-                    if (set.hasSystemError == 'SystemError') {
-                        Swal.fire({
-                            title: 'Opps!',
-                            text: 'Unable to RTS due to system error. Please try again later.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            // This code block will be executed only if the user clicks "OK"
-                            if (result.isConfirmed) {
-                                var si = setInterval(function () {
-                                    clearInterval(si);
-                                    document.location = '/'
-                                }, 1000);
-                            } else if (result.dismiss) {
-                                var si = setInterval(function () {
-                                    clearInterval(si);
-                                    document.location = '/'
-                                }, 1000);
-                            }
-                        });
-                    }
-                    else {
-                        Swal.fire({
-                            title: 'Opps!',
-                            text: 'The order is unable to process at the moment. Please try again later!',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            // This code block will be executed only if the user clicks "OK"
-                            if (result.isConfirmed) {
-                                var si = setInterval(function () {
-                                    clearInterval(si);
-                                    document.location = '/'
-                                }, 1000);
-                            } else if (result.dismiss) {
-                                var si = setInterval(function () {
-                                    clearInterval(si);
-                                    document.location = '/'
-                                }, 1000);
-                            }
-                        });
-                    }
-                }
-
-                else if (set.set == "CancelledOrders") {
-                    Swal.fire({
-                        title: 'Oops!',
-                        text: 'This order was cancelled while you are packing',
+                        title: 'Opps!',
+                        text: 'Unable to RTS due to system error. Please try again later.',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     }).then((result) => {
@@ -487,10 +458,64 @@ function ScanQRPrinter() {
                             }, 1000);
                         }
                     });
-
                 }
-                else if (set.set == "Exception") {
-                    ajaxLoader('hide');
+                else {
+                    Swal.fire({
+                        title: 'Opps!',
+                        text: 'The order is unable to process at the moment. Please try again later!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        // This code block will be executed only if the user clicks "OK"
+                        if (result.isConfirmed) {
+                            var si = setInterval(function () {
+                                clearInterval(si);
+                                document.location = '/'
+                            }, 1000);
+                        } else if (result.dismiss) {
+                            var si = setInterval(function () {
+                                clearInterval(si);
+                                document.location = '/'
+                            }, 1000);
+                        }
+                    });
+                }
+                retryCountReset();
+            }
+
+            else if (set.set == "CancelledOrders") {
+                Swal.fire({
+                    title: 'Oops!',
+                    text: 'This order was cancelled while you are packing',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    // This code block will be executed only if the user clicks "OK"
+                    if (result.isConfirmed) {
+                        var si = setInterval(function () {
+                            clearInterval(si);
+                            document.location = '/'
+                        }, 1000);
+                    } else if (result.dismiss) {
+                        var si = setInterval(function () {
+                            clearInterval(si);
+                            document.location = '/'
+                        }, 1000);
+                    }
+                });
+
+                retryCountReset();
+            }
+            else if (set.set == "Exception") {
+                updateRetryMessage();
+
+                if (retries > 0) {
+                    setTimeout(function () {
+                        callDoneBoxer(result, retries - 1);
+                    }, 3000);
+                }
+                else {
+                    ajaxLoaderRetry('hide');
 
                     Swal.fire({
                         title: 'Oops!',
@@ -498,30 +523,23 @@ function ScanQRPrinter() {
                         icon: 'error',
                         confirmButtonText: 'OK'
                     })
+                    retryCountReset();
                 }
-                else if (set.set == "TrackingNumberNotFound") {
-                    ajaxLoader('hide');
+            }
+            else if (set.set == "TrackingNumberNotFound") {
+                ajaxLoaderRetry('hide');
 
-                    Swal.fire({
-                        title: 'Oops!',
-                        text: 'Tracking No. not found. Please retry to proceed',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    })
-                }
-            });
-
-        }
-        else {
-            $("#closeScanQRPrinter").click();
-            Swal.fire({
-                title: 'Oops!',
-                text: 'The Printer QR Code must have WP in text!',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            })
-        }
+                Swal.fire({
+                    title: 'Oops!',
+                    text: 'Tracking No. not found. Please retry to proceed',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                })
+                retryCountReset();
+            }
+        });
     }
+
     function error(err) {
         //console.error(err);
     }

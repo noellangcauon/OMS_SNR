@@ -6024,7 +6024,7 @@ namespace SNR_BGC.Controllers
 
                 for (int x = 0; x < responseJsonCanceled["data"]["orders"].Count(); x++)
                 {
-                    var orderId = responseJsonCanceled["data"]["orders"][x]["order_number"].ToString();
+                    var orderId = responseJsonCanceled["data"]["orders"][x]["order_number"].ToString(); //get canceled orderid
                     bool isItemCancelled = false;
                     var CanceledOrdersData = new List<CanceledOrders>();
                     CanceledOrdersData = _userInfoConn.CanceledOrders.Where(e => e.orderId == orderId).ToList();
@@ -6065,19 +6065,18 @@ namespace SNR_BGC.Controllers
                         JObject responseJson = JObject.Parse(obj);
 
                         int cnt = responseJson["data"].Count();
-
+                        var canceledItemsCount = 0;
                         for (int i = 0; i < cnt; i++)
                         {
-                            if (responseJson["data"][i]["status"].ToString() == "pending")
-                            {
-                                isItemCancelled = true;
-
-                                break;
-                            }
-
+                            if (responseJson["data"][i]["status"].ToString() == "canceled")
+                                canceledItemsCount++;
                         }
 
-                        if (isItemCancelled == false)
+                        if (canceledItemsCount == cnt)
+                            isItemCancelled = true;
+
+
+                        if (isItemCancelled)
                         {
                             var canceledorder = new CanceledOrders();
 
@@ -6113,7 +6112,7 @@ namespace SNR_BGC.Controllers
                             var ordersTableHeaderExist = new List<OrderHeaderClass>();
                             ordersTableHeaderExist = _userInfoConn.orderTableHeader.Where(e => e.orderId == orderId).ToList();
 
-                            if (ordersTableExist.Count > 0 && ordersTableHeaderExist.Count < 0)
+                            if (ordersTableExist.Count > 0 && ordersTableHeaderExist.Count > 0)
                             {
                                 for (int i = 0; i < cnt; i++)
                                 {
