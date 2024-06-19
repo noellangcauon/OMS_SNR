@@ -696,7 +696,7 @@ namespace SNR_BGC.Controllers
                                                     using var shopee_cmd_clear = new SqlCommand(shopee_sql_clear, shopee_connsd);
                                                     var shopee_result_clear = shopee_cmd_clear.ExecuteScalar();
 
-                                                    string shopee_sql_ecom = "SELECT SUM([OnHand]) FROM [EcommerceHub].[dbo].[Inventories] Where Sku= " + shopee_sku_id + " GROUP BY SKU";
+                                                    string shopee_sql_ecom = "SELECT SUM([OnHand]) FROM [EcommerceHub].[dbo].[Inventories] Where Sku= " + shopee_sku_id + " AND OnHand IS NOT NULL GROUP BY SKU";
                                                     using var shopee_cmd_ecom = new SqlCommand(shopee_sql_ecom, shopee_conns_ecom);
                                                     var shopee_result_ecom = shopee_cmd_ecom.ExecuteScalar();
                                                     shopee_totalStocks_ecom = shopee_result_ecom == null ? 0 : (decimal)shopee_result_ecom;

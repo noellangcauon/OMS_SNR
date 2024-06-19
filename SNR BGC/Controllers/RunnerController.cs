@@ -82,46 +82,52 @@ namespace SNR_BGC.Controllers
 
             var status = string.Empty;
             var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
-            var cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
-            using var conns = new SqlConnection(cs);
-            conns.Open();
+            //var cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
+            //using var conns = new SqlConnection(cs);
+            //conns.Open();
 
 
-            string Upc = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where SKU={sku} AND UPC = {upc} ";
-            using var cmddd = new SqlCommand(Upc, conns);
-            var upcresult = cmddd.ExecuteScalar();
+            //string Upc = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where SKU={sku} AND UPC = {upc} ";
+            //using var cmddd = new SqlCommand(Upc, conns);
+            //var upcresult = cmddd.ExecuteScalar();
 
-            //var items = new List<OrderClass>();
-            //items = _userInfoConn.ordersTable.Where(e => e.typeOfexception == "NIB").ToList();
+            ////var items = new List<OrderClass>();
+            ////items = _userInfoConn.ordersTable.Where(e => e.typeOfexception == "NIB").ToList();
 
-            conns.Close();
+            //conns.Close();
+
+            decimal? upcresult = null;
+            var itemUPC = _userInfoConn.ItemUPC.Where(w => w.SKU == sku && w.UPC == decimal.Parse(upc)).FirstOrDefault();
 
             string convertedUPC = string.Empty;
-            if (upcresult == null)
+            if (itemUPC == null)
             {
                 BarcodeConverter barcodeConverter = new BarcodeConverter();
                 convertedUPC = barcodeConverter.UPCConverter(upc);
                 if (convertedUPC != "")
                 {
                     var claims2 = (System.Security.Claims.ClaimsIdentity)User.Identity;
-                    var cs2 = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
-                    using var conns2 = new SqlConnection(cs2);
-                    conns2.Open();
+                    //var cs2 = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
+                    //using var conns2 = new SqlConnection(cs2);
+                    //conns2.Open();
 
 
-                    string Upc2 = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where SKU={sku} AND UPC = {convertedUPC} ";
-                    using var cmddd2 = new SqlCommand(Upc2, conns2);
-                    upcresult = cmddd2.ExecuteScalar();
-                    conns2.Close();
+                    //string Upc2 = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where SKU={sku} AND UPC = {convertedUPC} ";
+                    //using var cmddd2 = new SqlCommand(Upc2, conns2);
+                    //upcresult = cmddd2.ExecuteScalar();
+                    //conns2.Close();
+
+                    itemUPC = _userInfoConn.ItemUPC.Where(w => w.SKU == sku && w.UPC == decimal.Parse(convertedUPC)).FirstOrDefault();
                 }
             }
 
-            if (upcresult == null)
+            if (itemUPC == null)
             {
                 status = "Wrong";
             }
             else
             {
+                upcresult = itemUPC.UPC;
                 status = "Correct";
             }
 
@@ -402,7 +408,7 @@ namespace SNR_BGC.Controllers
                 using var connsd = new SqlConnection(csd);
                 connsd.Open();
 
-                string sql_ecom = $"UPDATE [dbo].[Inventories] SET OnHand = OnHand + 1 WHERE SKU = '{ordersTable[i].sku_id}'";
+                string sql_ecom = $"UPDATE [dbo].[Inventories] SET OnHand = ISNULL(OnHand, 0) + 1 WHERE SKU = '{ordersTable[i].sku_id}'";
                 using var cmd_ecom = new SqlCommand(sql_ecom, connsd);
                 var result_ecom = cmd_ecom.ExecuteScalar();
                 connsd.Close();

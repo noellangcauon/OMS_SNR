@@ -690,10 +690,10 @@ namespace SNR_BGC.Controllers
 
 
 
-        public JsonResult GetPickingTimePerPicker(string condition)
+        public JsonResult GetPickingTimePerPicker(string condition, string dateFrom, string dateTo)
         {
             IEnumerable<OMSDashboardModel> items = new List<OMSDashboardModel>();
-            items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetPickingTimePerPicker", new { condition });
+            items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetPickingTimePerPicker", new { condition, dateFrom, dateTo });
 
 
             return Json(new { set = items });

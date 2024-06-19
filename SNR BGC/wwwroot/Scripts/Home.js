@@ -20,8 +20,8 @@ $(document).ready(function () {
 
     getOMSDashboard(firstDay, lastDay)
     getDiscrepancyNotification();
-    viewTopPickerPerItem();
-    viewTopPickerPerJO();
+    //viewTopPickerPerItem();
+    //viewTopPickerPerJO();
     viewTopPackerPerItem();
     viewTopPackerPerJO();
 
@@ -85,8 +85,8 @@ function getOMSDashboard(dateFrom, dateTo) {
     getPackingTimePerItem(dateFrom, dateTo);
     getPackingTimePerJO(dateFrom, dateTo);
     getShippedStatus(dateFrom, dateTo);
-
-
+    viewTopPickerPerItem(dateFrom, dateTo);
+    viewTopPickerPerJO(dateFrom, dateTo);
 
 }
 
@@ -874,7 +874,7 @@ $('#viewPicker').on('click', function () {
     var count = 0;
     $.ajax({
         method: "GET",
-        url: '/Home/GetPickingTimePerPicker?condition=PerItem',
+        url: `/Home/GetPickingTimePerPicker?condition=PerItem&dateFrom=${$('#dateFrom').val()}&dateTo=${$('#dateTo').val()}`,
     }).done(function (set) {
         tableGenerator('#listOfPicker', set, 'bad', 'PerItem');
     });
@@ -889,7 +889,7 @@ $('#viewPickerPerJO').on('click', function () {
     var count = 0;
     $.ajax({
         method: "GET",
-        url: '/Home/GetPickingTimePerPicker?condition=PerJO',
+        url: `/Home/GetPickingTimePerPicker?condition=PerJO&dateFrom=${$('#dateFrom').val()}&dateTo=${$('#dateTo').val()}`,
     }).done(function (set) {
         tableGenerator('#listOfPicker', set, 'bad', 'PerJO');
 
@@ -929,10 +929,10 @@ $('#viewPackerPerJO').on('click', function () {
 
 })
 
-function viewTopPickerPerItem() {
+function viewTopPickerPerItem(dateFrom, dateTo) {
     $.ajax({
         method: "GET",
-        url: '/Home/GetPickingTimePerPicker?condition=TopPerItem',
+        url: `/Home/GetPickingTimePerPicker?condition=TopPerItem&dateFrom=${dateFrom}&dateTo=${dateTo}`,
     }).done(function (set) {
         tableGenerator('#tblTop5PickerPerItem', set, 'bad', 'PerItem');
 
@@ -940,10 +940,10 @@ function viewTopPickerPerItem() {
 }
 
 
-function viewTopPickerPerJO() {
+function viewTopPickerPerJO(dateFrom, dateTo) {
     $.ajax({
         method: "GET",
-        url: '/Home/GetPickingTimePerPicker?condition=TopPerJO',
+        url: `/Home/GetPickingTimePerPicker?condition=TopPerJO&dateFrom=${dateFrom}&dateTo=${dateTo}`,
     }).done(function (set) {
         tableGenerator('#tblTop5PickerPerJO', set, 'bad', 'PerJO');
 

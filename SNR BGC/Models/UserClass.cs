@@ -50,7 +50,8 @@ namespace SNR_BGC.Models
         public DbSet<BoxerLogs> BoxerLogs { get; set; }
         public DbSet<OperationTimeOut> OperationTimeOut { get; set; }
         public DbSet<AutoReloadLogs> AutoReloadLogs { get; set; }
-        
+        public DbSet<ItemUPC> ItemUPC { get; set; }
+
 
 
 

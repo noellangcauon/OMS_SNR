@@ -204,39 +204,43 @@ namespace SNR_BGC.Controllers
 
             var status = string.Empty;
             var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
-            var cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
-            using var conns = new SqlConnection(cs);
-            conns.Open();
+            //var cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
+            //using var conns = new SqlConnection(cs);
+            //conns.Open();
 
 
-            string Upc = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {upc} ";
-            using var cmddd = new SqlCommand(Upc, conns);
-            var upcresult = cmddd.ExecuteScalar();
+            //string Upc = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {upc} ";
+            //using var cmddd = new SqlCommand(Upc, conns);
+            //var upcresult = cmddd.ExecuteScalar();
 
             //var items = new List<OrderClass>();
             //items = _userInfoConn.ordersTable.Where(e => e.typeOfexception == "NIB").ToList();
 
+            var itemUPC = _userInfoConn.ItemUPC.Where(w => w.UPC == decimal.Parse(upc)).FirstOrDefault();
 
             string convertedUPC = string.Empty;
-            if (upcresult == null)
+            if (itemUPC == null)
             {
                 BarcodeConverter barcodeConverter = new BarcodeConverter();
                 convertedUPC = barcodeConverter.UPCConverter(upc);
                 if (convertedUPC != "")
                 {
                     var claims2 = (System.Security.Claims.ClaimsIdentity)User.Identity;
-                    var cs2 = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
-                    using var conns2 = new SqlConnection(cs2);
-                    conns2.Open();
+                    //var cs2 = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
+                    //using var conns2 = new SqlConnection(cs2);
+                    //conns2.Open();
 
 
-                    string Upc2 = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {convertedUPC} ";
-                    using var cmddd2 = new SqlCommand(Upc2, conns2);
-                    upcresult = cmddd2.ExecuteScalar();
-                    conns2.Close();
+                    //string Upc2 = $"SELECT UPC FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {convertedUPC} ";
+                    //using var cmddd2 = new SqlCommand(Upc2, conns2);
+                    //upcresult = cmddd2.ExecuteScalar();
+                    //conns2.Close();
+
+                    itemUPC = _userInfoConn.ItemUPC.Where(w => w.UPC == decimal.Parse(convertedUPC)).FirstOrDefault();
+
                 }
             }
-            if (upcresult == null)
+            if (itemUPC == null)
             {
                 status = "Wrong";
             }
@@ -245,7 +249,7 @@ namespace SNR_BGC.Controllers
                 status = "Correct";
             }
 
-            conns.Close();
+            //conns.Close();
             return Json(new { status = status });
         }
 
@@ -262,37 +266,40 @@ namespace SNR_BGC.Controllers
             {
                 string exist;
                 var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
-                var cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
-                using var conns = new SqlConnection(cs);
-                conns.Open();
+                //var cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
+                //using var conns = new SqlConnection(cs);
+                //conns.Open();
 
 
                 var user = claims.Claims.ToList()[0].Value;
-                string sku = $"SELECT SKU FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {upc} ";
-                using var cmddd = new SqlCommand(sku, conns);
-                var skuresult = cmddd.ExecuteScalar();
+                //string sku = $"SELECT SKU FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {upc} ";
+                //using var cmddd = new SqlCommand(sku, conns);
+                //var skuresult = cmddd.ExecuteScalar();
 
-                conns.Close();
+                //conns.Close();
 
-
+                decimal? skuresult = null;
+                var itemUPC = _userInfoConn.ItemUPC.Where(w => w.UPC == decimal.Parse(upc)).FirstOrDefault();
 
                 string convertedUPC = string.Empty;
-                if (skuresult == null)
+                if (itemUPC == null)
                 {
                     BarcodeConverter barcodeConverter = new BarcodeConverter();
                     convertedUPC = barcodeConverter.UPCConverter(upc.ToString());
                     if (convertedUPC != "")
                     {
                         var claims2 = (System.Security.Claims.ClaimsIdentity)User.Identity;
-                        var cs2 = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
-                        using var conns2 = new SqlConnection(cs2);
-                        conns2.Open();
+                        //var cs2 = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
+                        //using var conns2 = new SqlConnection(cs2);
+                        //conns2.Open();
 
 
-                        string sku2 = $"SELECT SKU FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {convertedUPC} ";
-                        using var cmddd2 = new SqlCommand(sku2, conns2);
-                        skuresult = cmddd2.ExecuteScalar();
-                        conns2.Close();
+                        //string sku2 = $"SELECT SKU FROM [SNR_ECOMMERCE].[dbo].[ItemUPC] Where UPC = {convertedUPC} ";
+                        //using var cmddd2 = new SqlCommand(sku2, conns2);
+                        //skuresult = cmddd2.ExecuteScalar();
+                        //conns2.Close();
+
+                        itemUPC = _userInfoConn.ItemUPC.Where(w => w.UPC == decimal.Parse(convertedUPC)).FirstOrDefault();
                     }
                 }
 
@@ -303,10 +310,12 @@ namespace SNR_BGC.Controllers
                 //items = _userInfoConn.ordersTable.Where(e => e.typeOfexception == "NIB").ToList();
 
 
-                if (skuresult == null)
+                if (itemUPC == null)
                 {
                     return Json(new { status = "NotExistBarcode" });
                 }
+                else
+                    skuresult = itemUPC.SKU;
 
                 var orderItem = new ClearedOrders();
                 orderItem = _userInfoConn.clearedOrders.Where(e => e.orderId == orderId && e.skuId == skuresult.ToString()).FirstOrDefault();

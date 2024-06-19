@@ -889,7 +889,7 @@ namespace SNR_BGC.Controllers
                         using var cmd_clear = new SqlCommand(sql_clear, connsd);
                         var result_clear = cmd_clear.ExecuteScalar();
 
-                        string sql_ecom = "SELECT SUM([OnHand]) FROM [EcommerceHub].[dbo].[Inventories] Where Sku= " + @sku_num + " GROUP BY SKU";
+                        string sql_ecom = "SELECT SUM([OnHand]) FROM [EcommerceHub].[dbo].[Inventories] Where Sku= " + @sku_num + " AND OnHand IS NOT NULL GROUP BY SKU";
                         using var cmd_ecom = new SqlCommand(sql_ecom, conns_ecom);
                         var result_ecom = cmd_ecom.ExecuteScalar();
                         totalStocks_ecom = result_ecom == null ? 0 : (decimal)result_ecom;
