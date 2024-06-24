@@ -6173,7 +6173,7 @@ namespace SNR_BGC.Controllers
                                         using var conns = new SqlConnection(cs);
                                         conns.Open();
 
-                                        string sqld1_add = $"INSERT INTO clearedOrders (deductedStockEcom, deductedStock2017, dateProcess, skuId, orderId, module, processBy, isFreeItem, isNIB, isFromNIB) SELECT 1, 1, GETDATE(), sku_id, orderId, 'shopee', 'System', 0, 0, 0 FROM ordersTable WHERE orderId = '{orderId}' AND platform_status <> 'canceled' ";
+                                        string sqld1_add = $"INSERT INTO clearedOrders (deductedStockEcom, deductedStock2017, dateProcess, skuId, orderId, module, processBy, isFreeItem, isNIB, isFromNIB) SELECT 1, 1, GETDATE(), sku_id, orderId, 'lazada', 'System', 0, 0, 0 FROM ordersTable WHERE orderId = '{orderId}' AND platform_status <> 'canceled' ";
                                         using var cmdd1_add = new SqlCommand(sqld1_add, conns);
                                         cmdd1_add.ExecuteNonQuery();
                                         conns.Close();

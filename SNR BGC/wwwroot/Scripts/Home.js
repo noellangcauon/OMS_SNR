@@ -16,16 +16,7 @@ $(document).ready(function () {
     $('#dateFrom').val(firstDay);
     $('#dateTo').val(lastDay);
 
-    CheckNIB();
-
-    getOMSDashboard(firstDay, lastDay)
-    getDiscrepancyNotification();
-    //viewTopPickerPerItem();
-    //viewTopPickerPerJO();
-    viewTopPackerPerItem();
-    viewTopPackerPerJO();
-
-
+    CheckNIB(firstDay, lastDay);
 
     $(".flatpickr").flatpickr({
 
@@ -159,7 +150,7 @@ $("#dateTo").change(function () {
 
 
 
-function CheckNIB() {
+function CheckNIB(firstDay, lastDay) {
     $.ajax({
         type: "GET",
         url: "/Home/ViewNIB"
@@ -186,6 +177,13 @@ function CheckNIB() {
             document.location = '/AutoReload/IndexCatchShopee'
         }
         else if (set.user == 'OMS') {
+
+            getOMSDashboard(firstDay, lastDay)
+            getDiscrepancyNotification();
+            //viewTopPickerPerItem();
+            //viewTopPickerPerJO();
+            viewTopPackerPerItem();
+            viewTopPackerPerJO();
 
             Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
             Chart.defaults.global.defaultFontColor = '#858796';
