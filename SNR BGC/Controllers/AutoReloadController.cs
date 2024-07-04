@@ -172,9 +172,9 @@ namespace SNR_BGC.Controllers
 
                 try
                 {
-                    _logger.LogTrace($"{url}?partner_id={partnerId}&timestamp={timestamp}&access_token={access_token}&shop_id={shopId}&order_status=CANCELLED&sign={sign}&time_range_field=create_time&time_from={dateFrom_timestamp}&time_to={dateTo_timestamp}&page_size=50");
+                    _logger.LogTrace($"{url}?partner_id={partnerId}&timestamp={timestamp}&access_token={access_token}&shop_id={shopId}&order_status=CANCELLED&sign={sign}&time_range_field=update_time&time_from={dateFrom_timestamp}&time_to={dateTo_timestamp}&page_size=50");
                     using HttpResponseMessage httpResponse = await _policy.ExecuteAsync(async (ct) => await client.GetAsync(
-                        requestUri: $"{url}?partner_id={partnerId}&timestamp={timestamp}&access_token={access_token}&shop_id={shopId}&order_status=CANCELLED&sign={sign}&time_range_field=create_time&time_from={dateFrom_timestamp}&time_to={dateTo_timestamp}&page_size=50",
+                        requestUri: $"{url}?partner_id={partnerId}&timestamp={timestamp}&access_token={access_token}&shop_id={shopId}&order_status=CANCELLED&sign={sign}&time_range_field=update_time&time_from={dateFrom_timestamp}&time_to={dateTo_timestamp}&page_size=50",
                         cancellationToken: ct),
                         cancellationToken: cancellationToken);
 
@@ -226,6 +226,16 @@ namespace SNR_BGC.Controllers
                                             _userInfoConn.SaveChanges();
                                         }
 
+                                        var cs = _configuration.GetConnectionString("Myconnection");
+                                        using var conns = new SqlConnection(cs);
+                                        conns.Open();
+
+
+                                        string query = $"EXEC InsertCancelledOrders @orderId='{ordersn}'";
+                                        using var cmddd = new SqlCommand(query, conns);
+                                        var result = cmddd.ExecuteScalar();
+
+                                        conns.Close();
 
 
                                     }
@@ -550,6 +560,14 @@ namespace SNR_BGC.Controllers
         }
         public async Task<JsonResult> GetOrdersLazada([FromQuery] DateTime dateFrom, DateTime dateTo, CancellationToken stoppingToken)
         {
+            //var dateNow = DateTime.Now;
+            //var arLogs = _userInfoConn.AutoReloadLogs.OrderByDescending(o => o.id).FirstOrDefault(w => w.platform.ToLower() == "lazada");
+            //if (arLogs != null)
+            //if ((dateNow - arLogs.dateProcess.Value).TotalMinutes < 10)
+            //{
+            //    return Json(new { set = "Success" });
+            //}
+
             int insertedEntity = 0;
 
             var autoReloadLogs = new AutoReloadLogs();
