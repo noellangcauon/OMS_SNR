@@ -505,23 +505,28 @@ namespace SNR_BGC.Controllers
                 }
                 else if (claims.Claims.ToList()[3].Value.Contains("Picker"))
                 {
-                    var result = new List<ClearedOrders>();
-                    var ordersTableHeader = _userInfoConn.orderTableHeader.Where(u => u.exception == 1).Select(x => x.orderId).ToArray();
-                    result = _userInfoConn.clearedOrders.Where(e => e.pickerUser == user && e.pickerStatus != "Done" && !ordersTableHeader.Contains(e.orderId)).ToList();
+                    //var result = new List<ClearedOrders>();
+                    //var ordersTableHeader = _userInfoConn.orderTableHeader.Where(u => u.exception == 1).Select(x => x.orderId).ToArray();
+                    //result = _userInfoConn.clearedOrders.Where(e => e.pickerUser == user && e.pickerStatus != "Done" && !ordersTableHeader.Contains(e.orderId)).ToList();
 
-                    if (result.Count > 0)
-                    {
+                    IEnumerable<ClearedOrders> items = new List<ClearedOrders>();
+                    items = _dataAccess.ExecuteSP2<ClearedOrders, dynamic>("sp_GetClearedOrders_ForViewNIB", new { user });
 
-                        _userInfoConn.Dispose();
-                        return Json(new { set = result, user = "Picker" });
-                    }
-                    else
-                    {
-                        result = _userInfoConn.clearedOrders.Where(u => u.pickerUser == null && u.pickerStatus == null && !ordersTableHeader.Contains(u.orderId)).ToList();
+                    return Json(new { set = items, user = "Picker" });
 
-                        _userInfoConn.Dispose();
-                        return Json(new { set = result, user = "Picker" });
-                    }
+                    //if (result.Count > 0)
+                    //{
+
+                    //    _userInfoConn.Dispose();
+                    //    return Json(new { set = result, user = "Picker" });
+                    //}
+                    //else
+                    //{
+                    //    result = _userInfoConn.clearedOrders.Where(u => u.pickerUser == null && u.pickerStatus == null && !ordersTableHeader.Contains(u.orderId)).ToList();
+
+                    //    _userInfoConn.Dispose();
+                    //    return Json(new { set = result, user = "Picker" });
+                    //}
 
                 }
                 else if (claims.Claims.ToList()[3].Value.Contains("Boxer"))

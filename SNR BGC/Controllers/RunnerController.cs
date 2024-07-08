@@ -77,6 +77,21 @@ namespace SNR_BGC.Controllers
             return Json(new { set = items });
         }
 
+        static bool IsNotInteger(string input)
+        {
+            // Try to parse the string to an integer
+            if (double.TryParse(input, out _))
+            {
+                // If successful, it's an integer
+                return false;
+            }
+            else
+            {
+                // If not successful, it's not an integer
+                return true;
+            }
+        }
+
         public JsonResult ScannedUPC(string upc, int sku)
         {
 
@@ -97,6 +112,11 @@ namespace SNR_BGC.Controllers
             //conns.Close();
 
             decimal? upcresult = null;
+            if (IsNotInteger(upc))
+            {
+                return Json(new { set = upcresult, status = "Wrong" });
+            }
+
             var itemUPC = _userInfoConn.ItemUPC.Where(w => w.SKU == sku && w.UPC == decimal.Parse(upc)).FirstOrDefault();
 
             string convertedUPC = string.Empty;

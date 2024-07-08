@@ -199,6 +199,21 @@ namespace SNR_BGC.Controllers
             return Json(new { set = items, status = orderList, isdone = isDone });
         }
 
+        static bool IsNotInteger(string input)
+        {
+            // Try to parse the string to an integer
+            if (double.TryParse(input, out _))
+            {
+                // If successful, it's an integer
+                return false;
+            }
+            else
+            {
+                // If not successful, it's not an integer
+                return true;
+            }
+        }
+
         public JsonResult ScannedUPC(string upc)
         {
 
@@ -215,6 +230,11 @@ namespace SNR_BGC.Controllers
 
             //var items = new List<OrderClass>();
             //items = _userInfoConn.ordersTable.Where(e => e.typeOfexception == "NIB").ToList();
+
+            if (IsNotInteger(upc))
+            {
+                return Json(new { status = "Wrong" });
+            }
 
             var itemUPC = _userInfoConn.ItemUPC.Where(w => w.UPC == decimal.Parse(upc)).FirstOrDefault();
 
@@ -256,7 +276,7 @@ namespace SNR_BGC.Controllers
 
         public JsonResult SaveScan(string upc, string orderId, int qty)
         {
-            int Threshold = Convert.ToInt32( _configuration["Threshold"]);
+            int Threshold = Convert.ToInt32(_configuration["Threshold"]);
             if (qty > Threshold)
             {
 
@@ -444,7 +464,7 @@ namespace SNR_BGC.Controllers
                 _userInfoConn.SaveChanges();
                 return Json(new { set = orderId, status = "Existing" });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -788,21 +808,6 @@ namespace SNR_BGC.Controllers
         {
             try
             {
-                var boxerLogs = new BoxerLogs();
-                boxerLogs.orderId = orderId;
-                boxerLogs.logs = "step 1";
-                boxerLogs.dateProcess = DateTime.Now;
-                boxerLogs.printername = result;
-                boxerLogs.module = "";
-                boxerLogs.response = "";
-                boxerLogs.partnerId = "";
-                boxerLogs.shopId = "";
-                boxerLogs.access_token = "";
-                boxerLogs.partnerKey = "";
-                boxerLogs.filepath = "";
-                _userInfoConn.Add(boxerLogs);
-                _userInfoConn.SaveChanges();
-
                 var canceledOrders = new List<CanceledOrders>();
                 canceledOrders = _userInfoConn.CanceledOrders.Where(e => e.orderId == orderId).ToList();
                 if (canceledOrders.Count() > 0)
@@ -823,21 +828,6 @@ namespace SNR_BGC.Controllers
                     return Json(new { set = "CancelledOrders" });
                 }
 
-
-                boxerLogs = new BoxerLogs();
-                boxerLogs.orderId = orderId;
-                boxerLogs.logs = "step 2";
-                boxerLogs.dateProcess = DateTime.Now;
-                boxerLogs.printername = result;
-                boxerLogs.module = "";
-                boxerLogs.response = "";
-                boxerLogs.partnerId = "";
-                boxerLogs.shopId = "";
-                boxerLogs.access_token = "";
-                boxerLogs.partnerKey = "";
-                boxerLogs.filepath = "";
-                _userInfoConn.Add(boxerLogs);
-                _userInfoConn.SaveChanges();
                 var shopee_csd = _configuration.GetConnectionString("Myconnection");
                 using var shopee_connsd = new SqlConnection(shopee_csd);
                 shopee_connsd.Open();
@@ -876,23 +866,6 @@ namespace SNR_BGC.Controllers
                     oderItem.Add(item.order_item_id);
                 }
 
-
-
-                boxerLogs = new BoxerLogs();
-                boxerLogs.orderId = orderId;
-                boxerLogs.logs = "step 3";
-                boxerLogs.dateProcess = DateTime.Now;
-                boxerLogs.printername = result;
-                boxerLogs.module = "";
-                boxerLogs.response = "";
-                boxerLogs.partnerId = "";
-                boxerLogs.shopId = "";
-                boxerLogs.access_token = "";
-                boxerLogs.partnerKey = "";
-                boxerLogs.filepath = "";
-                _userInfoConn.Add(boxerLogs);
-                _userInfoConn.SaveChanges();
-
                 string package_id = string.Empty;
                 string[] orderItemId = oderItem.ToArray();
                 string itemIds = string.Join(",", orderItemId);
@@ -901,12 +874,23 @@ namespace SNR_BGC.Controllers
                 {
                     var obj = string.Empty;
                     var shipper = _userInfoConn.ordersTable.Where(f => f.orderId == orderId).Select(e => e.shipment_provider).FirstOrDefault();
+
+                    //ILazopClient client = new LazopClient(url, appkey, appSecret);
+                    //LazopRequest request = new LazopRequest();
+                    //request.SetApiName("/order/pack");
+                    //request.AddApiParameter("shipping_provider", shipper);
+                    //request.AddApiParameter("delivery_type", "dropship");
+                    //request.AddApiParameter("order_item_ids", "[" + itemIds + "]");
+                    //LazopResponse response = client.Execute(request, accessToken);
+                    //Console.WriteLine(response.IsError());
+                    //obj = response.Body;
+                    //JObject responseJson = JObject.Parse(obj);
+                    //Console.WriteLine(response.Body);
+
                     ILazopClient client = new LazopClient(url, appkey, appSecret);
                     LazopRequest request = new LazopRequest();
-                    request.SetApiName("/order/pack");
-                    request.AddApiParameter("shipping_provider", shipper);
-                    request.AddApiParameter("delivery_type", "dropship");
-                    request.AddApiParameter("order_item_ids", "[" + itemIds + "]");
+                    request.SetApiName("/order/fulfill/pack");
+                    request.AddApiParameter("packReq", "{\"pack_order_list\":[{\"order_item_list\":[" + itemIds + "],\"order_id\":" + orderId + "}],\"delivery_type\":\"dropship\",\"shipping_allocate_type\":\"TFS\"}");
                     LazopResponse response = client.Execute(request, accessToken);
                     Console.WriteLine(response.IsError());
                     obj = response.Body;
@@ -930,31 +914,17 @@ namespace SNR_BGC.Controllers
                         boxOrderTracking = _userInfoConn.boxOrders.Where(e => e.orderId == orderId).ToList();
                         for (int x = 0; x < boxOrderTracking.Count; x++)
                         {
-                            boxOrderTracking[x].trackingNo = responseJson["data"]["order_items"][x]["tracking_number"].ToString();
-                            boxOrderTracking[x].package_id = responseJson["data"]["order_items"][x]["package_id"].ToString();
+                            boxOrderTracking[x].trackingNo = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["tracking_number"].ToString();
+                            boxOrderTracking[x].package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
                             _userInfoConn.Update(boxOrderTracking[x]);
 
-                            package_id = responseJson["data"]["order_items"][x]["package_id"].ToString();
+                            package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
 
 
                         }
                         _userInfoConn.SaveChanges();
                     }
 
-                    boxerLogs = new BoxerLogs();
-                    boxerLogs.orderId = orderId;
-                    boxerLogs.logs = "step 4";
-                    boxerLogs.dateProcess = DateTime.Now;
-                    boxerLogs.printername = result;
-                    boxerLogs.module = module;
-                    boxerLogs.response = response.Body;
-                    boxerLogs.partnerId = "";
-                    boxerLogs.shopId = "";
-                    boxerLogs.access_token = "";
-                    boxerLogs.partnerKey = "";
-                    boxerLogs.filepath = "";
-                    _userInfoConn.Add(boxerLogs);
-                    _userInfoConn.SaveChanges();
 
                     if (responseJson["code"].ToString() != "0")
                     {
@@ -1000,21 +970,6 @@ namespace SNR_BGC.Controllers
                             Console.WriteLine(response2.IsError());
                             Console.WriteLine(response2.Body);
 
-
-                            boxerLogs = new BoxerLogs();
-                            boxerLogs.orderId = orderId;
-                            boxerLogs.logs = "step 5";
-                            boxerLogs.dateProcess = DateTime.Now;
-                            boxerLogs.printername = result;
-                            boxerLogs.module = module;
-                            boxerLogs.response = response2.Body;
-                            boxerLogs.partnerId = "";
-                            boxerLogs.shopId = "";
-                            boxerLogs.access_token = "";
-                            boxerLogs.partnerKey = "";
-                            boxerLogs.filepath = "";
-                            _userInfoConn.Add(boxerLogs);
-                            _userInfoConn.SaveChanges();
 
                             string sqld2 = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='', @ShopeeShopID='', @PrinterName='{result}',@Token='', @PartnerKey=''";
                             using var cmdd2 = new SqlCommand(sqld2, connsd);
@@ -1090,22 +1045,6 @@ namespace SNR_BGC.Controllers
                         Console.WriteLine(response2.Body);
 
 
-                        boxerLogs = new BoxerLogs();
-                        boxerLogs.orderId = orderId;
-                        boxerLogs.logs = "step 6";
-                        boxerLogs.dateProcess = DateTime.Now;
-                        boxerLogs.printername = result;
-                        boxerLogs.module = module;
-                        boxerLogs.response = response2.Body;
-                        boxerLogs.partnerId = "";
-                        boxerLogs.shopId = "";
-                        boxerLogs.access_token = "";
-                        boxerLogs.partnerKey = "";
-                        boxerLogs.filepath = "";
-                        _userInfoConn.Add(boxerLogs);
-                        _userInfoConn.SaveChanges();
-
-
                         string logs = response2.Body;
 
                         if (logs.Contains("40010"))
@@ -1118,24 +1057,6 @@ namespace SNR_BGC.Controllers
                             Console.WriteLine(response3.IsError());
                             Console.WriteLine(response3.Body);
 
-
-                            boxerLogs = new BoxerLogs();
-                            boxerLogs.orderId = orderId;
-                            boxerLogs.logs = "step 7.1";
-                            boxerLogs.dateProcess = DateTime.Now;
-                            boxerLogs.printername = result;
-                            boxerLogs.module = module;
-                            boxerLogs.response = response3.Body;
-                            boxerLogs.partnerId = "";
-                            boxerLogs.shopId = "";
-                            boxerLogs.access_token = "";
-                            boxerLogs.partnerKey = "";
-                            boxerLogs.filepath = "";
-                            _userInfoConn.Add(boxerLogs);
-                            _userInfoConn.SaveChanges();
-
-
-
                             string logs2 = response3.Body;
 
                             if (logs2.Contains("40010"))
@@ -1147,22 +1068,6 @@ namespace SNR_BGC.Controllers
                                 LazopResponse response4 = client4.Execute(request4, accessToken);
                                 Console.WriteLine(response4.IsError());
                                 Console.WriteLine(response4.Body);
-
-
-                                boxerLogs = new BoxerLogs();
-                                boxerLogs.orderId = orderId;
-                                boxerLogs.logs = "step 7.2";
-                                boxerLogs.dateProcess = DateTime.Now;
-                                boxerLogs.printername = result;
-                                boxerLogs.module = module;
-                                boxerLogs.response = response4.Body;
-                                boxerLogs.partnerId = "";
-                                boxerLogs.shopId = "";
-                                boxerLogs.access_token = "";
-                                boxerLogs.partnerKey = "";
-                                boxerLogs.filepath = "";
-                                _userInfoConn.Add(boxerLogs);
-                                _userInfoConn.SaveChanges();
 
 
                                 string logs3 = response4.Body;
@@ -1308,26 +1213,11 @@ namespace SNR_BGC.Controllers
                     }
 
 
-                    boxerLogs = new BoxerLogs();
-                    boxerLogs.orderId = orderId;
-                    boxerLogs.logs = "step 4";
-                    boxerLogs.dateProcess = DateTime.Now;
-                    boxerLogs.printername = result;
-                    boxerLogs.module = module;
-                    boxerLogs.response = resultApi;
-                    boxerLogs.partnerId = "";
-                    boxerLogs.shopId = "";
-                    boxerLogs.access_token = access_token.ToString();
-                    boxerLogs.partnerKey = "";
-                    boxerLogs.filepath = "";
-                    _userInfoConn.Add(boxerLogs);
-                    _userInfoConn.SaveChanges();
-
                 }
 
 
                 var partnerKey = _configuration["Infrastructure:ShopeeApi:v2:PartnerKey"] ?? "";
-                
+
                 string sqld = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='{shopId}', @ShopeeShopID='{shopId}', @PrinterName='{result}',@Token='{access_token.ToString()}', @PartnerKey='{partnerKey}'";
                 using var cmdd = new SqlCommand(sqld, connsd);
                 result_clear = (cmdd.ExecuteScalar()).ToString();
@@ -1344,22 +1234,6 @@ namespace SNR_BGC.Controllers
 
                     apiUrl = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&filepath={printerExe.filepath}";
 
-
-
-                    boxerLogs = new BoxerLogs();
-                    boxerLogs.orderId = orderId;
-                    boxerLogs.logs = "step 8";
-                    boxerLogs.dateProcess = DateTime.Now;
-                    boxerLogs.printername = result;
-                    boxerLogs.module = module;
-                    boxerLogs.response = "";
-                    boxerLogs.partnerId = "";
-                    boxerLogs.shopId = "";
-                    boxerLogs.access_token = "";
-                    boxerLogs.partnerKey = "";
-                    boxerLogs.filepath = printerExe.filepath;
-                    _userInfoConn.Add(boxerLogs);
-                    _userInfoConn.SaveChanges();
                 }
                 else
                 {
@@ -1368,22 +1242,6 @@ namespace SNR_BGC.Controllers
 
                     apiUrl = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&accessToken={access_token.ToString()}&partnerKey={partnerKey}&partnerId={partnerId}&shopId={shopId}&filepath={printerExe.filepath}";
 
-
-
-                    boxerLogs = new BoxerLogs();
-                    boxerLogs.orderId = orderId;
-                    boxerLogs.logs = "step 8";
-                    boxerLogs.dateProcess = DateTime.Now;
-                    boxerLogs.printername = result;
-                    boxerLogs.module = module;
-                    boxerLogs.response = "";
-                    boxerLogs.partnerId = shopId.ToString();
-                    boxerLogs.shopId = shopId.ToString();
-                    boxerLogs.access_token = access_token.ToString();
-                    boxerLogs.partnerKey = partnerKey;
-                    boxerLogs.filepath = printerExe.filepath;
-                    _userInfoConn.Add(boxerLogs);
-                    _userInfoConn.SaveChanges();
                 }
                 using (HttpClient client = new HttpClient())
                 {
@@ -1444,20 +1302,20 @@ namespace SNR_BGC.Controllers
             }
             catch (Exception ex)
             {
-                var boxerLogs = new BoxerLogs();
-                boxerLogs.orderId = orderId;
-                boxerLogs.logs = "DoneBoxer Exception: " + ex.Message;
-                boxerLogs.dateProcess = DateTime.Now;
-                boxerLogs.printername = result;
-                boxerLogs.module = "";
-                boxerLogs.response = "";
-                boxerLogs.partnerId = "";
-                boxerLogs.shopId = "";
-                boxerLogs.access_token = "";
-                boxerLogs.partnerKey = "";
-                boxerLogs.filepath = "";
-                _userInfoConn.Add(boxerLogs);
-                _userInfoConn.SaveChanges();
+                //var boxerLogs = new BoxerLogs();
+                //boxerLogs.orderId = orderId;
+                //boxerLogs.logs = "DoneBoxer Exception: " + ex.Message;
+                //boxerLogs.dateProcess = DateTime.Now;
+                //boxerLogs.printername = result;
+                //boxerLogs.module = "";
+                //boxerLogs.response = "";
+                //boxerLogs.partnerId = "";
+                //boxerLogs.shopId = "";
+                //boxerLogs.access_token = "";
+                //boxerLogs.partnerKey = "";
+                //boxerLogs.filepath = "";
+                //_userInfoConn.Add(boxerLogs);
+                //_userInfoConn.SaveChanges();
 
                 return Json(new
                 {
@@ -1465,7 +1323,7 @@ namespace SNR_BGC.Controllers
                 });
             }
         }
-        
+
 
         public async Task<JsonResult> DoneBoxerAlready(CancellationToken stoppingToken, string orderId, string result)
         {

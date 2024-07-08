@@ -484,6 +484,8 @@ function ScanQRPrinter() {
             }
 
             else if (set.set == "CancelledOrders") {
+                ajaxLoaderRetry('hide');
+
                 Swal.fire({
                     title: 'Oops!',
                     text: 'This order was cancelled while you are packing',
@@ -535,6 +537,10 @@ function ScanQRPrinter() {
                     icon: 'error',
                     confirmButtonText: 'OK'
                 })
+                retryCountReset();
+            }
+            else {
+                ajaxLoaderRetry('hide');
                 retryCountReset();
             }
         });

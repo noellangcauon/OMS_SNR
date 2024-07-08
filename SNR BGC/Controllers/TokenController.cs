@@ -793,6 +793,16 @@ namespace SNR_BGC.Controllers
 
 
         }
+
+        public JsonResult GetOrderItemDetails([FromQuery] string order_id)
+        {
+            var result = new List<OrderClass>();
+            result = _userInfoConn.ordersTable.Where(p => p.orderId == order_id).ToList();
+            return Json(new { set = result });
+
+
+        }
+
         public JsonResult SaveOrders(string order_id)
         {
             var claimUser = User.Claims.FirstOrDefault(c => c.Type == "username");

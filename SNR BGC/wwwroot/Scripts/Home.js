@@ -1154,7 +1154,13 @@ function tableOrdersPerHour(table, data, flag, type) {
                 { "data": "description" },
                 { "data": "lazada" },
                 { "data": "shopee" },
-
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return (parseFloat(row.lazada) + parseFloat(row.shopee)).toFixed(2);
+                    },
+                    "title": "Total"
+                }
 
 
             ]
