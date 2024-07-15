@@ -806,6 +806,14 @@ namespace SNR_BGC.Controllers
 
         public async Task<JsonResult> DoneBoxer(CancellationToken stoppingToken, string orderId, string result)
         {
+            var shopee_csd = _configuration.GetConnectionString("Myconnection");
+            using var shopee_connsd = new SqlConnection(shopee_csd);
+            shopee_connsd.Open();
+
+            var csd = _configuration.GetConnectionString("Myconnection");
+            using var connsd = new SqlConnection(csd);
+            connsd.Open();
+
             try
             {
                 var canceledOrders = new List<CanceledOrders>();
@@ -824,24 +832,16 @@ namespace SNR_BGC.Controllers
                     conns.Close();
 
 
-
+                    connsd.Close();
+                    shopee_connsd.Close();
                     return Json(new { set = "CancelledOrders" });
                 }
 
-                var shopee_csd = _configuration.GetConnectionString("Myconnection");
-                using var shopee_connsd = new SqlConnection(shopee_csd);
-                shopee_connsd.Open();
+                
 
                 string shopee_sql_token = "SELECT TOP 1 accessToken FROM shopeeToken order by entryId Desc";
                 using var shopee_cmd_token = new SqlCommand(shopee_sql_token, shopee_connsd);
                 var access_token = shopee_cmd_token.ExecuteScalar();
-
-
-                var csd = _configuration.GetConnectionString("Myconnection");
-                using var connsd = new SqlConnection(csd);
-                connsd.Open();
-
-
 
 
 
@@ -1005,6 +1005,8 @@ namespace SNR_BGC.Controllers
                         }
                         else
                         {
+                            connsd.Close();
+                            shopee_connsd.Close();
                             return Json(new
                             {
                                 set = "Failed"
@@ -1073,6 +1075,8 @@ namespace SNR_BGC.Controllers
                                 string logs3 = response4.Body;
                                 if (logs3.Contains("40010"))
                                 {
+                                    connsd.Close();
+                                    shopee_connsd.Close();
                                     return Json(new
                                     {
                                         set = "Failed",
@@ -1097,122 +1101,18 @@ namespace SNR_BGC.Controllers
 
                         if (resultApi2 == "Failed")
                         {
-
-                            var errorLogs = new List<ErrorLogs>();
-                            errorLogs = _userInfoConn.ErrorLogs.Where(e => e.orderId == orderId).ToList();
-                            bool isAlreadyPack = false;
-                            foreach (var errorLog in errorLogs)
-                            {
-                                if (errorLog.Logs.Contains("{\"error\":\"\",\"message\":\"\","))
-                                {
-                                    isAlreadyPack = true;
-                                }
-                            }
-
                             string trackingNo = await GetShopeeTrackingNo(access_token.ToString(), orderId);
-                            if (isAlreadyPack)
+                            if (string.IsNullOrEmpty(trackingNo) || string.IsNullOrWhiteSpace(trackingNo))
                             {
-
-                                if (!string.IsNullOrEmpty(trackingNo) && !string.IsNullOrWhiteSpace(trackingNo))
+                                connsd.Close();
+                                shopee_connsd.Close();
+                                return Json(new
                                 {
-                                    var partnerKey2 = _configuration["Infrastructure:ShopeeApi:v2:PartnerKey"] ?? "";
-
-                                    string sqld2 = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='{shopId}', @ShopeeShopID='{shopId}', @PrinterName='{result}',@Token='{access_token.ToString()}', @PartnerKey='{partnerKey2}'";
-                                    using var cmdd2 = new SqlCommand(sqld2, connsd);
-                                    result_clear = (cmdd2.ExecuteScalar()).ToString();
-
-
-
-                                    string apiUrl2 = string.Empty;
-
-                                    var printerExe = new printerExeClass();
-                                    printerExe = _userInfoConn.printerExe.Where(e => e.printer == result && e.platform == module).FirstOrDefault();
-
-                                    apiUrl2 = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&accessToken={access_token.ToString()}&partnerKey={partnerKey2}&partnerId={partnerId}&shopId={shopId}&filepath={printerExe.filepath}";
-
-
-
-                                    using (HttpClient client = new HttpClient())
-                                    {
-                                        // Make a GET request
-                                        HttpResponseMessage response = await client.GetAsync(apiUrl2);
-
-                                        if (response.IsSuccessStatusCode)
-                                        {
-                                            // Read and display the response content
-                                            string content = await response.Content.ReadAsStringAsync();
-                                            Console.WriteLine(content);
-
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine($"Error: {response.StatusCode}");
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    return Json(new
-                                    {
-                                        set = "TrackingNumberNotFound"
-                                    });
-                                }
+                                    set = "TrackingNumberNotFound"
+                                });
                             }
-                            else
-                            {
-                                //if (trackingNo != null && trackingNo != "")
-                                if (!string.IsNullOrEmpty(trackingNo) && !string.IsNullOrWhiteSpace(trackingNo))
-                                {
-                                    var partnerKey2 = _configuration["Infrastructure:ShopeeApi:v2:PartnerKey"] ?? "";
-
-                                    string sqld2 = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='{shopId}', @ShopeeShopID='{shopId}', @PrinterName='{result}',@Token='{access_token.ToString()}', @PartnerKey='{partnerKey2}'";
-                                    using var cmdd2 = new SqlCommand(sqld2, connsd);
-                                    result_clear = (cmdd2.ExecuteScalar()).ToString();
-
-
-
-                                    string apiUrl2 = string.Empty;
-
-                                    var printerExe = new printerExeClass();
-                                    printerExe = _userInfoConn.printerExe.Where(e => e.printer == result && e.platform == module).FirstOrDefault();
-
-                                    apiUrl2 = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&accessToken={access_token.ToString()}&partnerKey={partnerKey2}&partnerId={partnerId}&shopId={shopId}&filepath={printerExe.filepath}";
-
-
-
-                                    using (HttpClient client = new HttpClient())
-                                    {
-                                        // Make a GET request
-                                        HttpResponseMessage response = await client.GetAsync(apiUrl2);
-
-                                        if (response.IsSuccessStatusCode)
-                                        {
-                                            // Read and display the response content
-                                            string content = await response.Content.ReadAsStringAsync();
-                                            Console.WriteLine(content);
-
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine($"Error: {response.StatusCode}");
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    return Json(new
-                                    {
-                                        set = "TrackingNumberNotFound"
-                                    });
-                                }
-                            }
-
-
-
                         }
                     }
-
-
                 }
 
 
@@ -1221,10 +1121,6 @@ namespace SNR_BGC.Controllers
                 string sqld = $"EXEC DoneBoxerInsertPOS @OrderId='{orderId}', @ShopeePartnerID='{shopId}', @ShopeeShopID='{shopId}', @PrinterName='{result}',@Token='{access_token.ToString()}', @PartnerKey='{partnerKey}'";
                 using var cmdd = new SqlCommand(sqld, connsd);
                 result_clear = (cmdd.ExecuteScalar()).ToString();
-                connsd.Close();
-                shopee_connsd.Close();
-
-
 
                 string apiUrl = string.Empty;
                 if (module == "lazada")
@@ -1294,6 +1190,8 @@ namespace SNR_BGC.Controllers
                 //_userInfoConn.Add(boxerLogs);
                 //_userInfoConn.SaveChanges();
 
+                connsd.Close();
+                shopee_connsd.Close();
 
                 return Json(new
                 {
@@ -1316,6 +1214,9 @@ namespace SNR_BGC.Controllers
                 //boxerLogs.filepath = "";
                 //_userInfoConn.Add(boxerLogs);
                 //_userInfoConn.SaveChanges();
+
+                connsd.Close();
+                shopee_connsd.Close();
 
                 return Json(new
                 {
@@ -1690,21 +1591,39 @@ namespace SNR_BGC.Controllers
                             var address_id = (int)(responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["address_id"] ?? "");
                             var timeSlotCount = responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["time_slot_list"].Count();
                             //var pickup_time_id = (responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["time_slot_list"]?[timeSlotCount - 1]?["pickup_time_id"] ?? "").ToString();
-                            var pickup_time_id = (responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["time_slot_list"]?[0]?["pickup_time_id"] ?? "").ToString();
 
-
-
-
-                            var array = new
+                            var pickup_time_id = "";
+                            var jsonPayload = "";
+                            if (timeSlotCount > 0)
                             {
-                                order_sn = orderId,
-                                pickup = new
+                                pickup_time_id = (responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["time_slot_list"]?[0]?["pickup_time_id"] ?? "").ToString();
+
+                                var array = new
                                 {
-                                    address_id = address_id,
-                                    pickup_time_id = pickup_time_id
-                                }
-                            };
-                            string jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(array);
+                                    order_sn = orderId,
+                                    pickup = new
+                                    {
+                                        address_id = address_id,
+                                        pickup_time_id = pickup_time_id
+                                    }
+                                };
+
+                                jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(array);
+                            }
+                            else
+                            {
+                                var array = new
+                                {
+                                    order_sn = orderId,
+                                    pickup = new
+                                    {
+                                        address_id = address_id
+                                    }
+                                };
+
+                                jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(array);
+                            }
+                                
 
 
                             string url2 = _configuration["Infrastructure:ShopeeApi:v2:EndPoints:Product:ShipOrder:Url"] ?? "";
