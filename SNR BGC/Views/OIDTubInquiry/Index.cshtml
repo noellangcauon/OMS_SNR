@@ -17,10 +17,10 @@
                     <div class="card-body">
                         <div class="tab-content pt-2" id="">
                             <div class="tab-pane fade show active" id="" role="tabpanel">
+
                                 <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="oidItems">
                                     <thead>
                                         <tr>
-
                                             <th style="white-space: nowrap; color: blue;">Order ID</th>
                                             <th style="white-space: nowrap; color: blue;">Module</th>
                                             <th style="white-space: nowrap; color: blue;">Total Order Items</th>
@@ -30,8 +30,10 @@
                                             <th style="white-space: nowrap; color: blue;">Tub No</th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody>
+                                    </tbody>
                                 </table>
+                                <center><div id="loader">Loading...</div></center>
                             </div>
 
 
@@ -105,7 +107,45 @@
     </div>
 </div>
 
+<div id="itemModalTub" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="itemModalTub" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="overlay" id="addedit-modal-overlay" hidden>
+                <span class='spinner-border spinner-border-md'></span>
+            </div>
+            <div class="modal-header bg-primary border-bottom">
+                <h4 class="modal-title" id="addedit-modalLabel" style="color:white">Tub History</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="sortable table table-bordered table-responsive-md table-hover" id="listOfTubs" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th style="white-space: nowrap;">Order ID</th>
+                                    <th style="white-space: nowrap;">Date</th> @*DateProcess*@
+                                    <th style="white-space: nowrap;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <div id="divFetchItem" data-request-url="@Url.Action("GetOrderItemDetails", "Token")"></div>
+<div id="divFetchTub" data-request-url="@Url.Action("GetTubHistory", "OIDTubInquiry")"></div>
 
 @section Scripts {
 

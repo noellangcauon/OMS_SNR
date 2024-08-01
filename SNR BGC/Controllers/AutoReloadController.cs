@@ -1257,7 +1257,12 @@ namespace SNR_BGC.Controllers
                                         shopee_customerID = jtoken.Value<string>("buyer_username") ?? "";
 
                                         JArray array2 = jtoken.Value<JArray>("item_list")!;
-                                        shopee_cnt = array2.Count();
+                                        //shopee_cnt = array2.Count();
+
+                                        foreach (JToken jItem in array2)
+                                        {
+                                            shopee_cnt += jItem.Value<int>("model_quantity_purchased");
+                                        }
 
                                         //result.TryGetValue(shopee_ordersn, out var packagenumber);
                                         //Console.WriteLine(packagenumber);

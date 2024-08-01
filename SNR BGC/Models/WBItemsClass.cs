@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace SNR_BGC.Models
 {
-    public class BoxOrders
+    public class WBItemsClass
     {
-        [Key]
         public int boxId { get; set; }
         public int? reserveId { get; set; }
         public string? skuId { get; set; }
@@ -27,6 +26,7 @@ namespace SNR_BGC.Models
         public string? trackingNo { get; set; }
         public string? package_id { get; set; }
         public string? order_item_id { get; set; }
+        public string? item_description { get; set; }
 
 
     }

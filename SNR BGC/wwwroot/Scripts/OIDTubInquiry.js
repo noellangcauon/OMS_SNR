@@ -28,6 +28,8 @@ function tableGenerator(table, data) {
         var counter = 0;
         dTable.destroy();
 
+        $('#loader').show();
+
         dTable = $(table).DataTable({
             "scrollY": '50vh',
             "responsive": true,
@@ -37,60 +39,19 @@ function tableGenerator(table, data) {
             "searching": true,
             "data": data.set,
             dom: 'Bfrtip',
-            "pageLength": 20,
+            "pageLength": 10,
             "order": [],
-            buttons: [
-            //    {
-            //    extend: 'print',
-            //    text: '<i class="bi bi-printer-fill"></i> Print',
-            //    className: '',
-            //    messageTop: "Exception Items",
-            //    title: 'Exception Report',
-            //    orientation: 'landscape',
-            //    customize: function (win) {
-            //        $(win.document.body)
-            //            .css('font-size', '7pt')
-            //        $(win.document.body).find('table')
-            //            .addClass('compact')
-            //            .css('font-size', 'inherit');
-            //        $(win.document.body).find('td > input').parent().text(function () {
-            //            return $(this).find('.handicapIndex').val();
-            //        });
-            //    },
-            //    exportOptions: {
-            //        //stripHtml: false,
-            //        orthogonal: "myExport",
-            //        columns: [0, 1, 2, 3, 4, 5, 6, 7],
-            //    },
-            //    //TEMPshareholderName.length - 1 > 0 ? TEMPshareholderName.join(" OR ") : TEMPshareholderName
-            //}, {
-            //    extend: 'excelHtml5',
-            //    text: '<i class= "fa fa-download"></i > Download',
-            //    className: '',
-            //    messageTop: "Exception Items",
-            //    title: 'Exception Report',
-            //    exportOptions: {
-            //        orthogonal: "myExport",
-            //        columns: [0, 1, 2, 3, 4, 5, 6, 7],
-            //    },
-            //    action: function (e, indicator, dt, node, config) {
-            //        //console.log(indicator);
-            //        //iqwerty.toast.toast('Downloading report file .... Please wait', toastInfo);
-            //        if (indicator) {
-            //            $.fn.DataTable.ext.buttons.excelHtml5.action.call(this, e, indicator, dt, node, config);
-            //            //iqwerty.toast.toast('Report downloaded successfully', toastSuccess);
-            //        } else { iqwerty.toast.toast('Download failed', toastFailed); }
-
-            //    }
-            //    }
-            ],
+            'initComplete': function () {
+                $('#loader').hide(); // Hide loader once DataTable is initialized
+            },
+            buttons: [],
             "columns": [
                 
                 { "data": "orderId" },
                 { "data": "module" },
                 {
                     "data": "item_count", "render": function (data, type, row) {
-                        return data = '<div ><a style="cursor:pointer" onclick="getOrderItems(this)" order_id="' + row.orderId + '">'+data+'</a></div>'
+                        return data = '<div ><a style="cursor:pointer; text-decoration: underline; color: blue;" onclick="getOrderItems(this)" order_id="' + row.orderId + '">'+data+'</a></div>'
                     }
                 },
                 { "data": "total_amount" },
@@ -121,7 +82,7 @@ function tableGenerator(table, data) {
                         if (data === null) {
                             return '<div>-</div>';
                         } else {
-                            return '<div><a href="#">' + data + '</a></div>';
+                            return '<div ><a style="cursor:pointer; text-decoration: underline; color: blue;" onclick="getTubs(this)" tub="' + data + '">'+data+'</a></div>'
                         }
                     }
                 }
@@ -234,6 +195,93 @@ getOrderItems = function (ths) {
             $(".dt-button").removeClass("dt-button");
             $("#itemsTxtHeader").text('ORDER # :  ' + order_id)
             $("#itemsOrderIdHeader").text(order_id);
+            moduleModal.modal("show");
+
+
+            JsBarcode(".barcode").init();
+
+        },
+        error: function (request, status, error) {
+
+            alert(error);
+        }
+    })
+
+
+
+}
+
+
+function tableGeneratorTubView(table, trans) {
+
+    let dTable = $(table).DataTable();
+    if (trans.set.length > 0) {
+        var counter = 0;
+        dTable.destroy();
+
+
+        dTable = $(table).DataTable({
+            "paging": true,
+            "data": trans.set,
+            dom: 'Bfrtip',
+            buttons: [],
+            "columns": [
+                { "data": "orderId" },
+                {
+                    "data": "dateProcess",
+                    "render": function (data) {
+                        let d = new Date(data),
+                            month = '' + (d.getMonth() + 1),
+                            day = '' + d.getDate(),
+                            year = d.getFullYear(),
+                            hours = '' + d.getHours(),
+                            minutes = '' + d.getMinutes();
+
+                        if (month.length < 2)
+                            month = '0' + month;
+                        if (day.length < 2)
+                            day = '0' + day;
+                        if (hours.length < 2)
+                            hours = '0' + hours;
+                        if (minutes.length < 2)
+                            minutes = '0' + minutes;
+                        return data = [month, day, year].join('-') + ' ' + [hours, minutes].join(':');
+                    }
+                },
+                { "data": "pickerStatus" }
+            ]
+        });
+
+    }
+    else {
+        dTable.clear().draw();
+        dTable.destroy();
+        dTable = $(table).DataTable({
+            "paging": true,
+            "language": {
+                "emptyTable": "No data available"
+            }
+        });
+    }
+}
+
+getTubs = function (ths) {
+
+    var tub = $(ths).attr("tub");
+    let moduleModal = $("#itemModalTub");
+    ajaxLoader('show');
+
+    $.ajax({
+        type: "POST",
+        url: $("#divFetchTub").data("request-url") + "?tub=" + tub,
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+
+            ajaxLoader('hide');
+            tableGeneratorTubView("#listOfTubs", data)
+            $(".dt-button").addClass("btn btn-primary");
+            $(".dt-button").removeClass("dt-button");
             moduleModal.modal("show");
 
 

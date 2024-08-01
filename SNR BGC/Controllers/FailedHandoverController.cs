@@ -24,7 +24,7 @@ using SNR_BGC.DataAccess;
 
 namespace SNR_BGC.Controllers
 {
-    public class OIDTubInquiryController : Controller
+    public class FailedHandoverController : Controller
 
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -46,7 +46,7 @@ namespace SNR_BGC.Controllers
 
 
 
-        public OIDTubInquiryController(IConfiguration configuration, UserClass tokenInfo, IWebHostEnvironment webHostEnvironment, IDbAccess dbAccess)
+        public FailedHandoverController(IConfiguration configuration, UserClass tokenInfo, IWebHostEnvironment webHostEnvironment, IDbAccess dbAccess)
         {
             _configuration = configuration;
 
@@ -70,24 +70,12 @@ namespace SNR_BGC.Controllers
             return View();
         }
 
-
-        public IActionResult ExceptionReport()
-        {
-
-            return View();
-        }
-        public IActionResult ExceptionReportDiscrepancy()
-        {
-
-            return View();
-        }
-
-        public JsonResult GetInquiries(string search, int pageNumber, int pageSize)
+        public JsonResult GetFailedHandover(DateTime? DateFrom, DateTime? DateTo)
         {
             try
             {
-                IEnumerable<OIDInquiriesClass> items = new List<OIDInquiriesClass>();
-                items = _dbAccess.ExecuteSP2<OIDInquiriesClass, dynamic>("sp_GetInquiries", new { search });
+                IEnumerable<FailedHandoverClass> items = new List<FailedHandoverClass>();
+                items = _dbAccess.ExecuteSP2<FailedHandoverClass, dynamic>("sp_GetFailedHandover", new { DateFrom, DateTo });
                 return Json(new { set = items });
             }
             catch (Exception ex)
@@ -96,21 +84,6 @@ namespace SNR_BGC.Controllers
             }
             return Json(new { set = "" });
 
-        }
-
-        public JsonResult GetTubHistory([FromQuery] string tub)
-        {
-            try
-            {
-                IEnumerable<TubHistoryClass> items = new List<TubHistoryClass>();
-                items = _dbAccess.ExecuteSP2<TubHistoryClass, dynamic>("sp_GetTubHistory", new { tub });
-                return Json(new { set = items });
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return Json(new { set = "" });
         }
 
 

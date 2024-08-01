@@ -1,6 +1,7 @@
 ﻿using AspNetCore.ReportingServices.ReportProcessing.ReportObjectModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using SNR_BGC.DataAccess;
 using SNR_BGC.Models;
 using SNR_BGC.Utilities;
 using System;
@@ -15,15 +16,38 @@ namespace SNR_BGC.Controllers
     {
         private readonly UserClass _userInfoConn;
         private readonly IConfiguration _configuration;
+        private readonly IDbAccess _dbAccess;
 
-        public RunnerController(IConfiguration configuration, UserClass userinfo)
+        public RunnerController(IConfiguration configuration, UserClass userinfo, IDbAccess dbAccess)
         {
             _configuration = configuration;
             _userInfoConn = userinfo;
+            _dbAccess = dbAccess;
         }
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult RunnerStatus()
+        {
+            return View();
+        }
+
+        public JsonResult GetRunnerStatus()
+        {
+            try
+            {
+                IEnumerable<RunnerStatusClass> items = new List<RunnerStatusClass>();
+                items = _dbAccess.ExecuteSP2<RunnerStatusClass, dynamic>("sp_GetRunnerStatus", new { });
+                return Json(new { set = items });
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return Json(new { set = "" });
+
         }
 
         public JsonResult GetItemCollect()

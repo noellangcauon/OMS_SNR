@@ -97,6 +97,31 @@ namespace SNR_BGC.Controllers
 
         }
 
+        public IActionResult WBItems()
+        {
+            return View();
+        }
+
+        public JsonResult GetWBItems()
+        {
+            try
+            {
+                var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+                var user = claims.Claims.ToList()[0].Value;
+                //var user = "Dcualing@snrshopping.com";
+
+                IEnumerable<WBItemsClass> items = new List<WBItemsClass>();
+                items = _dbAccess.ExecuteSP2<WBItemsClass, dynamic>("sp_GetWBItems", new { user });
+                return Json(new { set = items });
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return Json(new { set = "" });
+
+        }
+
         public JsonResult GetItemPick()
         {
 
@@ -339,6 +364,7 @@ namespace SNR_BGC.Controllers
 
                 var orderItem = new ClearedOrders();
                 orderItem = _userInfoConn.clearedOrders.Where(e => e.orderId == orderId && e.skuId == skuresult.ToString()).FirstOrDefault();
+                var orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString()).FirstOrDefault();
                 exist = "Existing";
 
                 decimal upcInt = 0;
@@ -353,55 +379,24 @@ namespace SNR_BGC.Controllers
                 }
                 if (orderItem == null)
                 {
-
-                    var orderItem2 = new ClearedOrders();
-                    orderItem2 = _userInfoConn.clearedOrders.Where(e => e.skuId == skuresult.ToString()).FirstOrDefault();
-                    if (orderItem2 == null)
+                    for (var i = 0; i < qty; i++)
                     {
-
-                        for (var i = 0; i < qty; i++)
-                        {
-                            var boxItem2 = new BoxOrders();
-                            boxItem2.reserveId = 0;
-                            boxItem2.skuId = skuresult.ToString();
-                            boxItem2.orderId = orderId;
-                            boxItem2.module = "None";
-                            boxItem2.processBy = "None";
-                            boxItem2.dateProcess = DateTime.Now;
-                            boxItem2.boxerStatus = "Wrong";
-                            boxItem2.boxerUser = user;
-                            boxItem2.boxerStartTime = DateTime.Now;
-                            boxItem2.isScanned = true;
-                            boxItem2.UPC = upcInt;
-                            _userInfoConn.Add(boxItem2);
-                            _userInfoConn.SaveChanges();
-                        }
-                        return Json(new { set = orderId, status = "Existing" });
+                        var boxItem2 = new BoxOrders();
+                        boxItem2.reserveId = 0;
+                        boxItem2.skuId = skuresult.ToString();
+                        boxItem2.orderId = orderId;
+                        boxItem2.module = "None";
+                        boxItem2.processBy = "None";
+                        boxItem2.dateProcess = DateTime.Now;
+                        boxItem2.boxerStatus = "Wrong";
+                        boxItem2.boxerUser = user;
+                        boxItem2.boxerStartTime = DateTime.Now;
+                        boxItem2.isScanned = true;
+                        boxItem2.UPC = upcInt;
+                        _userInfoConn.Add(boxItem2);
+                        _userInfoConn.SaveChanges();
                     }
-                    else
-                    {
-                        for (var i = 0; i < qty; i++)
-                        {
-                            var boxItem2 = new BoxOrders();
-                            boxItem2.reserveId = orderItem2.reserveId;
-                            boxItem2.skuId = orderItem2.skuId;
-                            boxItem2.orderId = orderId;
-                            boxItem2.module = orderItem2.module;
-                            boxItem2.processBy = orderItem2.processBy;
-                            boxItem2.dateProcess = DateTime.Now;
-                            boxItem2.boxerStatus = "Wrong";
-                            boxItem2.boxerUser = user;
-                            boxItem2.boxerStartTime = DateTime.Now;
-                            boxItem2.isScanned = true;
-                            boxItem2.UPC = upcInt;
-                            _userInfoConn.Add(boxItem2);
-                            _userInfoConn.SaveChanges();
-
-                        }
-
-
-                        return Json(new { set = orderId, status = "Existing" });
-                    }
+                    return Json(new { set = orderId, status = "Existing" });
                 }
 
                 for (var i = 0; i < qty; i++)
@@ -419,6 +414,7 @@ namespace SNR_BGC.Controllers
                     boxItem.boxerStartTime = DateTime.Now;
                     boxItem.isScanned = true;
                     boxItem.UPC = upcInt;
+                    boxItem.order_item_id = orderTable != null ? orderTable.order_item_id : null;
                     //_userInfoConn.SaveChanges();
                     _userInfoConn.Add(boxItem);
                 }
@@ -805,6 +801,7 @@ namespace SNR_BGC.Controllers
         }
 
         public async Task<JsonResult> DoneBoxer(CancellationToken stoppingToken, string orderId, string result)
+        
         {
             var shopee_csd = _configuration.GetConnectionString("Myconnection");
             using var shopee_connsd = new SqlConnection(shopee_csd);
@@ -866,7 +863,7 @@ namespace SNR_BGC.Controllers
                     oderItem.Add(item.order_item_id);
                 }
 
-                string package_id = string.Empty;
+                //string package_id = string.Empty;
                 string[] orderItemId = oderItem.ToArray();
                 string itemIds = string.Join(",", orderItemId);
                 var result_clear = "";
@@ -912,15 +909,24 @@ namespace SNR_BGC.Controllers
                     {
                         var boxOrderTracking = new List<BoxOrders>();
                         boxOrderTracking = _userInfoConn.boxOrders.Where(e => e.orderId == orderId).ToList();
+                        JArray orderItemListArray = (JArray)responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"];
+                        List<OrderItemListClass> orderItemList = orderItemListArray.ToObject<List<OrderItemListClass>>();
                         for (int x = 0; x < boxOrderTracking.Count; x++)
                         {
-                            boxOrderTracking[x].trackingNo = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["tracking_number"].ToString();
-                            boxOrderTracking[x].package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
-                            _userInfoConn.Update(boxOrderTracking[x]);
+                            if (string.IsNullOrEmpty(boxOrderTracking[x].order_item_id))
+                            {
+                                boxOrderTracking[x].trackingNo = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["tracking_number"].ToString();
+                                boxOrderTracking[x].package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
+                                _userInfoConn.Update(boxOrderTracking[x]);
 
-                            package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
-
-
+                                //package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
+                            }
+                            else
+                            {
+                                boxOrderTracking[x].trackingNo = orderItemList.Where(w => w.order_item_id == boxOrderTracking[x].order_item_id).Select(s => s.tracking_number).FirstOrDefault();
+                                boxOrderTracking[x].package_id = orderItemList.Where(w => w.order_item_id == boxOrderTracking[x].order_item_id).Select(s => s.package_id).FirstOrDefault();
+                                _userInfoConn.Update(boxOrderTracking[x]);
+                            }
                         }
                         _userInfoConn.SaveChanges();
                     }
