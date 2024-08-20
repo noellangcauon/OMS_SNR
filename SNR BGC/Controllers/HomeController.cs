@@ -505,29 +505,10 @@ namespace SNR_BGC.Controllers
                 }
                 else if (claims.Claims.ToList()[3].Value.Contains("Picker"))
                 {
-                    //var result = new List<ClearedOrders>();
-                    //var ordersTableHeader = _userInfoConn.orderTableHeader.Where(u => u.exception == 1).Select(x => x.orderId).ToArray();
-                    //result = _userInfoConn.clearedOrders.Where(e => e.pickerUser == user && e.pickerStatus != "Done" && !ordersTableHeader.Contains(e.orderId)).ToList();
+                    //IEnumerable<ClearedOrders> items = new List<ClearedOrders>();
+                    //items = _dataAccess.ExecuteSP2<ClearedOrders, dynamic>("sp_GetClearedOrders_ForViewNIB", new { user });
 
-                    IEnumerable<ClearedOrders> items = new List<ClearedOrders>();
-                    items = _dataAccess.ExecuteSP2<ClearedOrders, dynamic>("sp_GetClearedOrders_ForViewNIB", new { user });
-
-                    return Json(new { set = items, user = "Picker" });
-
-                    //if (result.Count > 0)
-                    //{
-
-                    //    _userInfoConn.Dispose();
-                    //    return Json(new { set = result, user = "Picker" });
-                    //}
-                    //else
-                    //{
-                    //    result = _userInfoConn.clearedOrders.Where(u => u.pickerUser == null && u.pickerStatus == null && !ordersTableHeader.Contains(u.orderId)).ToList();
-
-                    //    _userInfoConn.Dispose();
-                    //    return Json(new { set = result, user = "Picker" });
-                    //}
-
+                    return Json(new { set = true, user = "Picker" });
                 }
                 else if (claims.Claims.ToList()[3].Value.Contains("Boxer"))
                 {
@@ -663,8 +644,27 @@ namespace SNR_BGC.Controllers
 
         }
 
-        public async Task<IActionResult> GetOMSDashboard(string condition, string dateFrom, string dateTo) =>
-             Ok(await _dataRepository.GetOMSDashboard(condition, dateFrom, dateTo));
+        public async Task<IActionResult> GetOMSDashboard(string condition, string dateFrom, string dateTo)
+        {
+            var newCountResult = 0;
+            if (condition.ToLower() == "averageorders")
+            {
+                IEnumerable<OMSDashboardModel> items = new List<OMSDashboardModel>();
+                items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetOrdersPerHour", new { dateFrom, dateTo });
+
+                foreach (var item in items)
+                {
+                    var lazadaCount = item.Lazada == null ? 0 : item.Lazada.Value;
+                    var shopeeCount = item.Shopee == null ? 0 : item.Shopee.Value;
+                    newCountResult += lazadaCount + shopeeCount;
+                }
+            }
+
+            var result = await _dataRepository.GetOMSDashboard(condition, dateFrom, dateTo);
+            result.count_result = condition.ToLower() == "averageorders" ? newCountResult : result.count_result;
+
+            return Ok(result);
+        }
 
         public async Task<IActionResult> GetOrderDetails(string condition, string dateFrom, string dateTo)
         {
@@ -707,10 +707,10 @@ namespace SNR_BGC.Controllers
 
 
 
-        public JsonResult GetPackingTimePerPicker(string condition)
+        public JsonResult GetPackingTimePerPicker(string condition, string dateFrom, string dateTo)
         {
             IEnumerable<OMSDashboardModel> items = new List<OMSDashboardModel>();
-            items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetPackingTimePerPicker", new { condition });
+            items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetPackingTimePerPicker", new { condition, dateFrom, dateTo });
 
 
             return Json(new { set = items });

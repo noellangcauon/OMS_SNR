@@ -111,9 +111,29 @@ namespace SNR_BGC.Controllers
         {
             return View();
         }
+
+        public JsonResult GetShopeeStatus()
+        {
+            var data = _userInfoConn.ECommerceStatus.FirstOrDefault(w => w.Name.ToLower() == "shopee");
+
+            return Json(new { data = data.IsActive });
+        }
+
+        public JsonResult ChangeShopeeStatus(bool status)
+        {
+            var data = _userInfoConn.ECommerceStatus.FirstOrDefault(w => w.Name.ToLower() == "shopee");
+            data.IsActive = status;
+            _userInfoConn.SaveChanges();
+
+            return Json(new { data = "success" });
+        }
+
         public IActionResult ViewShopeeOrder()
         {
+            var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+            var userRole = claims.Claims.ToList()[2].Value;
 
+            ViewBag.HasToggleAccess = userRole.ToLower() == "administrator" ? true : false;
             return View();
         }
 
@@ -672,6 +692,10 @@ namespace SNR_BGC.Controllers
 
                                                     string shopee_sku_id = jtoken2.Value<string>("item_sku") ?? "";
                                                     Decimal shopee_item_price = jtoken2.Value<Decimal>("model_discounted_price");
+
+                                                    if (shopee_item_price <= 0)
+                                                        shopee_item_price = jtoken2.Value<Decimal>("model_original_price");
+
                                                     string shopee_item_description = jtoken2.Value<string>("item_name") ?? "";
                                                     // Decimal shopee_variation_quantity_purchased = jtoken2.Value<Decimal>("variation_quantity_purchased");
 

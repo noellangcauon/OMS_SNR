@@ -16,6 +16,9 @@ $(document).ready(function () {
     $('#dateFrom').val(firstDay);
     $('#dateTo').val(lastDay);
 
+    $('#dateFromAT').val(firstDay);
+    $('#dateToAT').val(lastDay);
+
     CheckNIB(firstDay, lastDay);
 
     $(".flatpickr").flatpickr({
@@ -76,8 +79,11 @@ function getOMSDashboard(dateFrom, dateTo) {
     getPackingTimePerItem(dateFrom, dateTo);
     getPackingTimePerJO(dateFrom, dateTo);
     getShippedStatus(dateFrom, dateTo);
+
     viewTopPickerPerItem(dateFrom, dateTo);
     viewTopPickerPerJO(dateFrom, dateTo);
+    viewTopPackerPerItem(dateFrom, dateTo);
+    viewTopPackerPerJO(dateFrom, dateTo);
 
 }
 
@@ -89,10 +95,67 @@ function getDates(date) {
     return [year, month, day].join('-')
 }
 
+$("#dateFromAT").change(function () {
+    var dateFrom = new Date($('#dateFromAT').val());
+    var dateTo = new Date($('#dateToAT').val());
+    $('#dateFrom').val($('#dateFromAT').val());
+
+    if (dateFrom > dateTo) {
+        Swal.fire(
+            'Wrong Input!',
+            'Date From is greater than Date To',
+            'error'
+        )
+
+        var day = ("0" + dateTo.getDate()).slice(-2);
+        var month = ("0" + (dateTo.getMonth() + 1)).slice(-2);
+        var today = dateTo.getFullYear() + "-" + (month) + "-" + (day);
+
+        $('#dateFromAT').val(today);
+        $('#dateFrom').val(today);
+
+        dateFrom = new Date($('#dateFromAT').val());
+    }
+
+    var strdtFrom = getDates(dateFrom);
+    var strdtTo = getDates(dateTo);
+
+    getOMSDashboard(strdtFrom, strdtTo)
+});
+
+$("#dateToAT").change(function () {
+    var dateFrom = new Date($('#dateFromAT').val());
+    var dateTo = new Date($('#dateToAT').val());
+    $('#dateTo').val($('#dateToAT').val());
+
+
+    if (dateTo < dateFrom) {
+        Swal.fire(
+            'Wrong Input!',
+            'Date To is less than Date From',
+            'error'
+        )
+
+        var day = ("0" + dateFrom.getDate()).slice(-2);
+        var month = ("0" + (dateFrom.getMonth() + 1)).slice(-2);
+        var today = dateFrom.getFullYear() + "-" + (month) + "-" + (day);
+
+        $('#dateToAT').val(today);
+        $('#dateTo').val(today);
+
+        dateTo = new Date($('#dateToAT').val());
+    }
+
+    var strdtFrom = getDates(dateFrom);
+    var strdtTo = getDates(dateTo);
+
+    getOMSDashboard(strdtFrom, strdtTo)
+});
+
 $("#dateFrom").change(function () {
     var dateFrom = new Date($('#dateFrom').val());
     var dateTo = new Date($('#dateTo').val());
-
+    $('#dateFromAT').val($('#dateFrom').val());
 
     if (dateFrom > dateTo) {
         Swal.fire(
@@ -106,6 +169,7 @@ $("#dateFrom").change(function () {
         var today = dateTo.getFullYear() + "-" + (month) + "-" + (day);
 
         $('#dateFrom').val(today);
+        $('#dateFromAT').val(today);
 
         dateFrom = new Date($('#dateFrom').val());
     }
@@ -121,6 +185,7 @@ $("#dateFrom").change(function () {
 $("#dateTo").change(function () {
     var dateFrom = new Date($('#dateFrom').val());
     var dateTo = new Date($('#dateTo').val());
+    $('#dateToAT').val($('#dateTo').val());
 
     if (dateTo < dateFrom) {
         Swal.fire(
@@ -134,6 +199,7 @@ $("#dateTo").change(function () {
         var today = dateFrom.getFullYear() + "-" + (month) + "-" + (day);
 
         $('#dateTo').val(today);
+        $('#dateToAT').val(today);
 
         dateTo = new Date($('#dateTo').val());
     }
@@ -182,8 +248,8 @@ function CheckNIB(firstDay, lastDay) {
             getDiscrepancyNotification();
             //viewTopPickerPerItem();
             //viewTopPickerPerJO();
-            viewTopPackerPerItem();
-            viewTopPackerPerJO();
+            //viewTopPackerPerItem();
+            //viewTopPackerPerJO();
 
             Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
             Chart.defaults.global.defaultFontColor = '#858796';
@@ -284,19 +350,19 @@ function CheckNIB(firstDay, lastDay) {
                 })
             }
         } else if (set.user == 'Picker') {
-            if (set.set.length > 0) {
-                Swal.fire({
-                    title: 'Notification!',
-                    text: 'You got new Order(s) to Pick!',
-                    icon: 'info',
-                    confirmButtonText: 'Start'
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        document.location = '/Picker/Index'
-                    }
-                })
-            }
+            //if (set.set.length > 0) {
+            Swal.fire({
+                title: 'Notification!',
+                text: 'You got new Order(s) to Pick!',
+                icon: 'info',
+                confirmButtonText: 'Start'
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    document.location = '/Picker/Index'
+                }
+            })
+            //}
         }
         else if (set.user == 'Boxer') {
             if (set.set.length > 0) {
@@ -846,6 +912,8 @@ $('#viewOrdersPerHour').on('click', function () {
     let moduleModal = $("#orderPerHourModal");
     moduleModal.modal("show");
 
+    $("#orderPerHourHeader").text("Total Order Per Hour");
+
     getOrdersPerHour();
 
 })
@@ -857,6 +925,8 @@ $('#viewToShipOrders').on('click', function () {
 
     let moduleModal = $("#orderPerHourModal");
     moduleModal.modal("show");
+
+    $("#orderPerHourHeader").text("RTS Per Hour");
 
     getReadyToShipOrdersPerHour();
 
@@ -903,7 +973,7 @@ $('#viewPackerPerItem').on('click', function () {
     var count = 0;
     $.ajax({
         method: "GET",
-        url: '/Home/GetPackingTimePerPicker?condition=PerItem',
+        url: `/Home/GetPackingTimePerPicker?condition=PerItem&dateFrom=${$('#dateFrom').val()}&dateTo=${$('#dateTo').val()}`,
     }).done(function (set) {
         tableGenerator('#listOfPicker', set, 'bad', 'PerItem');
     });
@@ -918,7 +988,7 @@ $('#viewPackerPerJO').on('click', function () {
     var count = 0;
     $.ajax({
         method: "GET",
-        url: '/Home/GetPackingTimePerPicker?condition=PerJO',
+        url: `/Home/GetPackingTimePerPicker?condition=PerJO&dateFrom=${$('#dateFrom').val()}&dateTo=${$('#dateTo').val()}`,
     }).done(function (set) {
         tableGenerator('#listOfPicker', set, 'bad', 'PerJO');
 
@@ -948,10 +1018,10 @@ function viewTopPickerPerJO(dateFrom, dateTo) {
     });
 }
 
-function viewTopPackerPerItem() {
+function viewTopPackerPerItem(dateFrom, dateTo) {
     $.ajax({
         method: "GET",
-        url: '/Home/GetPackingTimePerPicker?condition=TopPerItem',
+        url: `/Home/GetPackingTimePerPicker?condition=TopPerItem&dateFrom=${dateFrom}&dateTo=${dateTo}`,
     }).done(function (set) {
         tableGenerator('#tblTop5PackerPerItem', set, 'bad', 'PerItem');
 
@@ -959,10 +1029,10 @@ function viewTopPackerPerItem() {
 }
 
 
-function viewTopPackerPerJO() {
+function viewTopPackerPerJO(dateFrom, dateTo) {
     $.ajax({
         method: "GET",
-        url: '/Home/GetPackingTimePerPicker?condition=TopPerJO',
+        url: `/Home/GetPackingTimePerPicker?condition=TopPerJO&dateFrom=${dateFrom}&dateTo=${dateTo}`,
     }).done(function (set) {
         tableGenerator('#tblTop5PackerPerJO', set, 'bad', 'PerJO');
 
@@ -973,6 +1043,8 @@ function viewTopPackerPerJO() {
 $('#viewItems').on('click', function () {
     let moduleModal = $("#listItemModal");
     moduleModal.modal("show");
+
+    $("#listDetailModal").text("Order Items");
 
     var dateFrom = getDates(new Date($('#dateFrom').val()));
     var dateTo = getDates(new Date($('#dateTo').val()));
@@ -1009,6 +1081,7 @@ $('#viewWaitingOrder').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("Pending Orders");
 
     GetOrderItemsDetails('WAITING', dateFrom, dateTo);
 
@@ -1019,6 +1092,7 @@ $('#viewWaitingToCollect').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("Waiting to Collect Orders");
 
     GetOrderItemsDetails('WAITINGTOCOLLECT', dateFrom, dateTo);
 
@@ -1030,6 +1104,7 @@ $('#viewWaitingToPick').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("Waiting to Pick Orders");
 
     GetOrderItemsDetails('WAITINGTOPICK', dateFrom, dateTo);
 
@@ -1040,6 +1115,7 @@ $('#viewPickOrders').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("Currently Picking");
 
     GetOrderItemsDetails('FORPICKING', dateFrom, dateTo);
 
@@ -1050,6 +1126,7 @@ $('#viewBoxOrders').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("For Packing Orders");
 
     GetOrderItemsDetails('FORBOXING', dateFrom, dateTo);
 
@@ -1060,6 +1137,7 @@ $('#viewCourierPicked').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("Dispatched");
 
     GetOrderItemsDetails('SHIPPEDSTATUS', dateFrom, dateTo);
 
@@ -1071,6 +1149,7 @@ $('#viewNOFOrders').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("NOF");
 
     GetOrderItemsDetails('NOF', dateFrom, dateTo);
 
@@ -1081,6 +1160,7 @@ $('#viewOutOfStockOrders').on('click', function () {
     let moduleModal = $("#orderItemModal");
     moduleModal.modal("show");
 
+    $("#detailModal").text("Out of Stock Orders");
 
     GetOrderItemsDetails('OOS', dateFrom, dateTo);
 

@@ -14,6 +14,7 @@ var isNew;
 
 
 $(document).ready(function () {
+    getShopeeStatus();
     getList();
     isNew = true;
 });
@@ -450,6 +451,36 @@ function tableGeneratorView(table, trans) {
             }
         });
     }
+}
+
+getShopeeStatus = function () {
+    $.ajax({
+        type: "POST",
+        url: $("#divGetStatus").data("request-url"),
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (result) {
+            $('#myToggle').prop('checked', result.data);
+            $('#myToggle').bootstrapToggle(result.data ? 'on' : 'off');
+        },
+        error: function (request, status, error) {
+            alert(error);
+        }
+    })
+}
+
+setToggleStatus = function (e) {
+    $.ajax({
+        type: "POST",
+        url: $("#divToggleStatus").data("request-url") + "?status=" + e.checked,
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+        },
+        error: function (request, status, error) {
+            alert(error);
+        }
+    })
 }
 
 

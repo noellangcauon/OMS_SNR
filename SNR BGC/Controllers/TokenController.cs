@@ -615,6 +615,22 @@ namespace SNR_BGC.Controllers
 
         }
 
+        public JsonResult GetLazadaStatus()
+        {
+            var data = _userInfoConn.ECommerceStatus.FirstOrDefault(w => w.Name.ToLower() == "lazada");
+
+            return Json(new { data = data.IsActive });
+        }
+
+        public JsonResult ChangeLazadaStatus(bool status)
+        {
+            var data = _userInfoConn.ECommerceStatus.FirstOrDefault(w => w.Name.ToLower() == "lazada");
+            data.IsActive = status;
+            _userInfoConn.SaveChanges();
+
+            return Json(new { data = "success" });
+        }
+
         public JsonResult GetOrdersReprocess()
         {
 
@@ -781,6 +797,10 @@ namespace SNR_BGC.Controllers
         }
         public IActionResult ViewOrdersLazada()
         {
+            var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+            var userRole = claims.Claims.ToList()[2].Value;
+
+            ViewBag.HasToggleAccess = userRole.ToLower() == "administrator" ? true : false;
 
             return View();
         }

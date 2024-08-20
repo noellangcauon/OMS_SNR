@@ -74,7 +74,7 @@ function tableGenerator(table, data) {
                 { "data": "runnerStatus" },
             ],
             "rowCallback": function (row, data, index) {
-                if (data.IsTooLong == "1") {
+                if (data.isTooLong == "1") {
                     $(row).css('color', 'red');
                 }
             }

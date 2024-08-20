@@ -364,7 +364,6 @@ namespace SNR_BGC.Controllers
 
                 var orderItem = new ClearedOrders();
                 orderItem = _userInfoConn.clearedOrders.Where(e => e.orderId == orderId && e.skuId == skuresult.ToString()).FirstOrDefault();
-                var orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString()).FirstOrDefault();
                 exist = "Existing";
 
                 decimal upcInt = 0;
@@ -399,8 +398,23 @@ namespace SNR_BGC.Controllers
                     return Json(new { set = orderId, status = "Existing" });
                 }
 
+                var boxOrders = _userInfoConn.boxOrders.Where(w => w.orderId == orderId).ToList();
+                var order_item_ids = new List<string>();
+
+                if (boxOrders.Count > 0)
+                    order_item_ids.AddRange(boxOrders.Select(s => s.order_item_id).ToList());
+
+                var orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString()).FirstOrDefault();
                 for (var i = 0; i < qty; i++)
                 {
+
+                    if (orderItem.module.ToLower() == "lazada")
+                    {
+                        if (order_item_ids.Count > 0)
+                            orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString() && !order_item_ids.Contains(e.order_item_id)).FirstOrDefault();
+                    }
+
+                    var orderItemId = orderTable != null ? orderTable.order_item_id : null;
 
                     var boxItem = new BoxOrders();
                     boxItem.reserveId = orderItem.reserveId;
@@ -414,9 +428,11 @@ namespace SNR_BGC.Controllers
                     boxItem.boxerStartTime = DateTime.Now;
                     boxItem.isScanned = true;
                     boxItem.UPC = upcInt;
-                    boxItem.order_item_id = orderTable != null ? orderTable.order_item_id : null;
-                    //_userInfoConn.SaveChanges();
+                    boxItem.order_item_id = orderItemId;
                     _userInfoConn.Add(boxItem);
+
+                    if (!string.IsNullOrEmpty(orderItemId))
+                        order_item_ids.Add(orderTable.order_item_id);
                 }
 
 
@@ -918,8 +934,6 @@ namespace SNR_BGC.Controllers
                                 boxOrderTracking[x].trackingNo = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["tracking_number"].ToString();
                                 boxOrderTracking[x].package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
                                 _userInfoConn.Update(boxOrderTracking[x]);
-
-                                //package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
                             }
                             else
                             {
@@ -1008,6 +1022,8 @@ namespace SNR_BGC.Controllers
                                     Console.WriteLine($"Error: {response3.StatusCode}");
                                 }
                             }
+
+                            Thread.Sleep(2000);
                         }
                         else
                         {
@@ -1163,6 +1179,7 @@ namespace SNR_BGC.Controllers
                     }
                 }
 
+                Thread.Sleep(2000);
 
 
 
@@ -1726,6 +1743,16 @@ namespace SNR_BGC.Controllers
                                 _userInfoConn.SaveChanges();
                             }
 
+                        }
+                        else
+                        {
+                            if (responseJsonShippingParam.ContainsKey("error"))
+                            {
+                                //var errMsg = responseJsonShippingParam["message"].ToString();
+                                shopee_connsd.Close();
+                                return "Failed";
+                            }
+                                
                         }
 
                     }

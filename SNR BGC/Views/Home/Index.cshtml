@@ -329,7 +329,7 @@
                                                     <div class="text-end">
                                                         <h2 class="text-white mt-2"><span data-plugin="counterup" id="averageOrdersPerHour">0</span></h2>
                                                         <button type="button" id="viewOrdersPerHour" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
-                                                            Average Order Per Hour
+                                                            Total Order Per Hour
                                                         </button>
                                                     </div>
                                                 </div>
@@ -370,6 +370,42 @@
         </div>
                 </div>
                 <div class="tab-pane" id="profile" role="tabpanel">
+                    <div class="card card-primary card-outline">
+                        <div class="card-body">
+                            <div class="row">
+
+                                <div class="card shadow-none">
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col-md-6 text-align:center align-items-md-center">
+                                                    <label> Date From </label>
+                                                </div>
+                                                <div class="col-md-6 text-align:center align-items-md-center">
+                                                    <input class="form-control flatpickr lazadaDate" id="dateFromAT" type="date" />
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col-md-6 text-align:center align-items-md-center">
+                                                    <label> Date To </label>
+                                                </div>
+                                                <div class="col-md-6 text-align:center align-items-md-center">
+                                                    <input class="form-control flatpickr lazadaDate" id="dateToAT" type="date" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6 col-xl-3">
                             <div class="card">
@@ -726,7 +762,7 @@
         <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
             <div class="modal-content" style="width:180%;">
                 <div class="modal-header modal-colored-header bg-primary text-center">
-                    <h3 class="modal-title" style="color:white">Item Details</h3>
+                    <h3 class="modal-title" style="color:white" id="listDetailModal">Item Details</h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                        
                     </button>
@@ -835,7 +871,7 @@
         <div class="modal-dialog-centered modal-dialog-scrollable modal-dialog modal-lg" role="document">
             <div class="modal-content" style="width:180%;">
                 <div class="modal-header modal-colored-header bg-primary text-center">
-                    <h3 class="modal-title" style="color:white">Item Details</h3>
+                    <h3 class="modal-title" style="color:white" id="detailModal">Item Details</h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>

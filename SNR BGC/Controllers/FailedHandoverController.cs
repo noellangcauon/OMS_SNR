@@ -74,6 +74,11 @@ namespace SNR_BGC.Controllers
         {
             try
             {
+                if (DateTo.HasValue)
+                {
+                    DateTo = DateTo.Value.Date.AddDays(1).AddSeconds(-1); // Sets time to 23:59:59
+                }
+
                 IEnumerable<FailedHandoverClass> items = new List<FailedHandoverClass>();
                 items = _dbAccess.ExecuteSP2<FailedHandoverClass, dynamic>("sp_GetFailedHandover", new { DateFrom, DateTo });
                 return Json(new { set = items });

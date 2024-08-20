@@ -2168,6 +2168,10 @@ namespace SNR_BGC.Controllers
 
                                                     string shopee_sku_id = jtoken2.Value<string>("item_sku") ?? "";
                                                     Decimal shopee_item_price = jtoken2.Value<Decimal>("model_discounted_price");
+
+                                                    if (shopee_item_price <= 0)
+                                                        shopee_item_price = jtoken2.Value<Decimal>("model_original_price");
+
                                                     string shopee_item_description = jtoken2.Value<string>("item_name") ?? "";
                                                     // Decimal shopee_variation_quantity_purchased = jtoken2.Value<Decimal>("variation_quantity_purchased");
 
@@ -3036,6 +3040,10 @@ namespace SNR_BGC.Controllers
 
                                                     string shopee_sku_id = jtoken2.Value<string>("item_sku") ?? "";
                                                     Decimal shopee_item_price = jtoken2.Value<Decimal>("model_discounted_price");
+
+                                                    if (shopee_item_price <= 0)
+                                                        shopee_item_price = jtoken2.Value<Decimal>("model_original_price");
+
                                                     string shopee_item_description = jtoken2.Value<string>("item_name") ?? "";
                                                     // Decimal shopee_variation_quantity_purchased = jtoken2.Value<Decimal>("variation_quantity_purchased");
 

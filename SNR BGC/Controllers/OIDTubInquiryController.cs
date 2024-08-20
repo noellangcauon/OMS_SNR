@@ -82,13 +82,16 @@ namespace SNR_BGC.Controllers
             return View();
         }
 
-        public JsonResult GetInquiries(string search, int pageNumber, int pageSize)
+        public JsonResult GetInquiries(string searchTerm, int pageNumber, int pageSize)
         {
             try
             {
+                searchTerm = string.IsNullOrEmpty(searchTerm) ? "" : searchTerm;
+                var count = _userInfoConn.orderTableHeader.Count();
+
                 IEnumerable<OIDInquiriesClass> items = new List<OIDInquiriesClass>();
-                items = _dbAccess.ExecuteSP2<OIDInquiriesClass, dynamic>("sp_GetInquiries", new { search });
-                return Json(new { set = items });
+                items = _dbAccess.ExecuteSP2<OIDInquiriesClass, dynamic>("sp_GetInquiries", new { searchTerm, pageNumber, pageSize });
+                return Json(new { set = items, recordsTotal = count, recordsFiltered = count });
             }
             catch (Exception ex)
             {

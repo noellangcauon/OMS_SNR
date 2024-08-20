@@ -14,6 +14,10 @@ namespace SNR_BGC.Models
         public string tub { get; set; }
         public decimal item_count { get; set; }
         public decimal total_amount { get; set; }
+        public DateTime? pickingStartTime { get; set; }
+        public DateTime? pickingEndTime { get; set; }
+        public DateTime? boxerStartTime { get; set; }
+        public DateTime? boxerEndTime { get; set; }
     }
-   
+
 }
