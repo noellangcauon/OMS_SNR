@@ -1023,7 +1023,7 @@ namespace SNR_BGC.Controllers
                                 }
                             }
 
-                            Thread.Sleep(2000);
+                            //Thread.Sleep(2000);
                         }
                         else
                         {
@@ -1179,7 +1179,7 @@ namespace SNR_BGC.Controllers
                     }
                 }
 
-                Thread.Sleep(2000);
+                //Thread.Sleep(2000);
 
 
 

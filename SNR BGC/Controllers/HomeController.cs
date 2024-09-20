@@ -647,10 +647,12 @@ namespace SNR_BGC.Controllers
         public async Task<IActionResult> GetOMSDashboard(string condition, string dateFrom, string dateTo)
         {
             var newCountResult = 0;
-            if (condition.ToLower() == "averageorders")
+            if (condition.ToLower() == "averageorders" || condition.ToLower() == "averageorders_hist")
             {
-                IEnumerable<OMSDashboardModel> items = new List<OMSDashboardModel>();
-                items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetOrdersPerHour", new { dateFrom, dateTo });
+                var spName = condition.ToLower() == "averageorders" ? "GetOrdersPerHour" : "GetOrdersPerHour_Hist";
+
+                IEnumerable <OMSDashboardModel> items = new List<OMSDashboardModel>();
+                items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>(spName, new { dateFrom, dateTo });
 
                 foreach (var item in items)
                 {
@@ -661,7 +663,8 @@ namespace SNR_BGC.Controllers
             }
 
             var result = await _dataRepository.GetOMSDashboard(condition, dateFrom, dateTo);
-            result.count_result = condition.ToLower() == "averageorders" ? newCountResult : result.count_result;
+
+            result.count_result = condition.ToLower() == "averageorders" || condition.ToLower() == "averageorders_hist" ? newCountResult : result.count_result;
 
             return Ok(result);
         }
@@ -732,10 +735,28 @@ namespace SNR_BGC.Controllers
             return Json(new { set = items });
         }
 
+        public JsonResult GetOrdersPerHour_Hist(string dateFrom, string dateTo)
+        {
+            IEnumerable<OMSDashboardModel> items = new List<OMSDashboardModel>();
+            items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetOrdersPerHour_Hist", new { dateFrom, dateTo });
+
+
+            return Json(new { set = items });
+        }
+
         public JsonResult GetReadyToShipOrdersPerHour(string dateFrom, string dateTo)
         {
             IEnumerable<OMSDashboardModel> items = new List<OMSDashboardModel>();
             items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetReadyToShipOrdersPerHour", new { dateFrom, dateTo });
+
+
+            return Json(new { set = items });
+        }
+
+        public JsonResult GetReadyToShipOrdersPerHour_Hist(string dateFrom, string dateTo)
+        {
+            IEnumerable<OMSDashboardModel> items = new List<OMSDashboardModel>();
+            items = _dataAccess.ExecuteSP2<OMSDashboardModel, dynamic>("GetReadyToShipOrdersPerHour_Hist", new { dateFrom, dateTo });
 
 
             return Json(new { set = items });

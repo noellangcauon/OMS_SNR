@@ -309,15 +309,19 @@ namespace SNR_BGC.Controllers
             var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
             var user = claims.Claims.ToList()[0].Value;
             var ordersTable = new List<OrderClass>();
+            var boxOrders = _userInfoConn.boxOrders.Select(s => s.orderId).Distinct().ToList();
             ordersTable = _userInfoConn.ordersTable.Where(e => e.sku_id == item.SKU && e.runnerUser == user).ToList();
             for (int i = 0; i < ordersTable.Count; i++)
             {
-                //UPDATE INVENTORY TO OOS
-                //ordersTable[i].runnerStatus = "";
-                //ordersTable[i].runnerUser = "";
-                ordersTable[i].typeOfexception = "NOF";
-                ordersTable[i].NOFUser = user;
-                _userInfoConn.Update(ordersTable[i]);
+                //check oid if existing in boxOrders. if not existing then proceed to tagging of NOF
+                if (!boxOrders.Contains(ordersTable[i].orderId))
+                {
+                    ordersTable[i].runnerStatus = null;
+                    ordersTable[i].runnerUser = null;
+                    ordersTable[i].typeOfexception = "NOF";
+                    ordersTable[i].NOFUser = user;
+                    _userInfoConn.Update(ordersTable[i]);
+                }
             }
 
             _userInfoConn.SaveChanges();

@@ -71,7 +71,9 @@ function getOMSDashboard(dateFrom, dateTo) {
     getPickedOrders(dateFrom, dateTo);
     getForBoxingOrders(dateFrom, dateTo);
     getToShipOrders(dateFrom, dateTo);
+    getToShipOrders_Hist(dateFrom, dateTo);
     getAverageOrderPerHour(dateFrom, dateTo);
+    getAverageOrderPerHour_Hist(dateFrom, dateTo);
     getNotOnFulfillment(dateFrom, dateTo);
     getOutOfStock(dateFrom, dateTo);
     getPickingTimePerItem(dateFrom, dateTo);
@@ -709,6 +711,21 @@ function getToShipOrders(dateFrom, dateTo) {
         }
     });
 }
+
+function getToShipOrders_Hist(dateFrom, dateTo) {
+    $.ajax({
+        url: `/Home/GetOMSDashboard?condition=TOSHIP_HIST&dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        type: 'GET',
+        dataType: 'json', // added data type
+        success: function (data) {
+
+            $('#toShipOrders_Hist').text(numberWithCommas(data.count_result));
+
+
+        }
+    });
+}
+
 function getAverageOrderPerHour(dateFrom, dateTo) {
     $.ajax({
         url: `/Home/GetOMSDashboard?condition=AVERAGEORDERS&dateFrom=${dateFrom}&dateTo=${dateTo}`,
@@ -717,6 +734,20 @@ function getAverageOrderPerHour(dateFrom, dateTo) {
         success: function (data) {
 
             $('#averageOrdersPerHour').text(numberWithCommas(data.count_result));
+
+
+        }
+    });
+}
+
+function getAverageOrderPerHour_Hist(dateFrom, dateTo) {
+    $.ajax({
+        url: `/Home/GetOMSDashboard?condition=AVERAGEORDERS_HIST&dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        type: 'GET',
+        dataType: 'json', // added data type
+        success: function (data) {
+
+            $('#averageOrdersPerHour_Hist').text(numberWithCommas(data.count_result));
 
 
         }
@@ -918,6 +949,19 @@ $('#viewOrdersPerHour').on('click', function () {
 
 })
 
+$('#viewOrdersPerHour_Hist').on('click', function () {
+
+
+
+    let moduleModal = $("#orderPerHourModal");
+    moduleModal.modal("show");
+
+    $("#orderPerHourHeader").text("Total Order Per Hour History");
+
+    getOrdersPerHour_Hist();
+
+})
+
 
 $('#viewToShipOrders').on('click', function () {
 
@@ -929,6 +973,19 @@ $('#viewToShipOrders').on('click', function () {
     $("#orderPerHourHeader").text("RTS Per Hour");
 
     getReadyToShipOrdersPerHour();
+
+})
+
+$('#viewToShipOrders_Hist').on('click', function () {
+
+
+
+    let moduleModal = $("#orderPerHourModal");
+    moduleModal.modal("show");
+
+    $("#orderPerHourHeader").text("RTS Per Hour History");
+
+    getReadyToShipOrdersPerHour_Hist();
 
 })
 
@@ -1067,6 +1124,20 @@ function getOrdersPerHour() {
     var dateTo = getDates(new Date($('#dateTo').val()));
     $.ajax({
         url: `/Home/GetOrdersPerHour?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        type: 'GET',
+        dataType: 'json', // added data type
+        success: function (set) {
+
+            tableOrdersPerHour('#tblOrderPerHour', set, 'bad');
+        }
+    });
+}
+
+function getOrdersPerHour_Hist() {
+    var dateFrom = getDates(new Date($('#dateFrom').val()));
+    var dateTo = getDates(new Date($('#dateTo').val()));
+    $.ajax({
+        url: `/Home/GetOrdersPerHour_Hist?dateFrom=${dateFrom}&dateTo=${dateTo}`,
         type: 'GET',
         dataType: 'json', // added data type
         success: function (set) {
@@ -1896,3 +1967,19 @@ function getReadyToShipOrdersPerHour() {
         }
     });
 }
+
+
+function getReadyToShipOrdersPerHour_Hist() {
+    var dateFrom = getDates(new Date($('#dateFrom').val()));
+    var dateTo = getDates(new Date($('#dateTo').val()));
+    $.ajax({
+        url: `/Home/GetReadyToShipOrdersPerHour_Hist?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        type: 'GET',
+        dataType: 'json', // added data type
+        success: function (set) {
+
+            tableOrdersPerHour('#tblOrderPerHour', set, 'bad');
+        }
+    });
+}
+

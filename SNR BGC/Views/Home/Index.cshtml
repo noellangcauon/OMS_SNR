@@ -219,7 +219,7 @@
                     </div> <!-- end col-->
 
                     <div class="col-md-6 col-xl-3">
-                        <div class="widget-rounded-circle card bg-info shadow-none">
+                        <div class="widget-rounded-circle card bg-info shadow-none" style="height: 133px;">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-6">
@@ -230,10 +230,13 @@
                                     <div class="col-6">
                                         <div class="text-end">
                                             <h2 class="text-white mt-2"><span data-plugin="counterup" id="toShipOrders">0</span></h2>
-                                            
-                                             <button type="button" id="viewToShipOrders" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
-                                                 Ready To Ship Orders
-                                             </button>
+
+                                            <button type="button" id="viewToShipOrders" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
+                                                Ready To Ship Orders
+                                            </button>
+                                            <a id="viewToShipOrders_Hist" class="btn btn-link text-white" style="margin-top: -7%; ">
+                                                [View History <label id="toShipOrders_Hist">0</label>]
+                                            </a>
                                         </div>
                                     </div>
                                 </div> <!-- end row-->
@@ -317,7 +320,7 @@
                                 </div> <!-- end col-->
 
                                 <div class="col-md-6 col-xl-3">
-                                    <div class="widget-rounded-circle card bg-primary shadow-none">
+                                    <div class="widget-rounded-circle card bg-primary shadow-none" style="height: 133px;">
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-6">
@@ -331,6 +334,10 @@
                                                         <button type="button" id="viewOrdersPerHour" class="btn btn-link rounded-pill waves-effect text-white mb-0 text-truncate">
                                                             Total Order Per Hour
                                                         </button>
+
+                                                        <a id="viewOrdersPerHour_Hist" class="btn btn-link text-white" style="margin-top: -7%;">
+                                                            [View History <label id="averageOrdersPerHour_Hist">0</label>]
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div> <!-- end row-->
