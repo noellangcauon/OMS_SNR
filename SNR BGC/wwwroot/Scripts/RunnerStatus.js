@@ -2,7 +2,32 @@
 
 $(document).ready(function () {
     getList();
+
+    $('#searchInput').on('keyup', function () {
+        $('#runnerList').DataTable().search(this.value).draw();
+    });
+
 });
+
+function ClearRunnerUser() {
+    console.log($("#selectRunner").val());
+    $('#clearModal').modal('show');
+}
+
+function ClearProceed() {
+    $.ajax({
+        method: "GET",
+        url: '/Runner/ClearRunnerUser?runnerUser=' + $("#selectRunner").val(),
+    }).done(function (response) {
+        $('#selectRunner').empty();
+        getList();
+    });
+}
+
+function SelectRunner() {
+    $('#clearModalLabel').text('Clear runner "' + $("#selectRunner").val() + '"?');
+    $('#clearButton').prop('disabled', false);
+}
 
 function getList() {
     $.ajax({
@@ -10,6 +35,24 @@ function getList() {
         url: '/Runner/GetRunnerStatus',
     }).done(function (set) {
         tableGenerator('#runnerList', set);
+
+        var filteredSet = set.set.filter(function (item) {
+            return item.isTooLong == "1";
+        });
+        console.log(filteredSet);
+
+
+        const uniqueObjects = filteredSet.filter((item, index, self) =>
+            index === self.findIndex((t) => (
+                t.runnerUser == item.runnerUser
+            ))
+        );
+
+        uniqueObjects.forEach(function (item) {
+            var newOption = $('<option></option>').val(item.runnerUser).text(item.runnerUser);
+            $('#selectRunner').append(newOption);
+        });
+
 
         $(".dt-button").addClass("btn btn-primary");
         $(".dt-button").removeClass("dt-button");

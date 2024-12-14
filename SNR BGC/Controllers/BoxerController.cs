@@ -34,6 +34,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Authentication;
 using System.Net.NetworkInformation;
 using Microsoft.AspNetCore.Http;
+using SNR_BGC.Interface;
 
 namespace SNR_BGC.Controllers
 {
@@ -53,9 +54,11 @@ namespace SNR_BGC.Controllers
         private readonly IServiceScope _scope;
         private readonly IDbAccess _dataAccess;
         private readonly IDbAccess _dbAccess;
+        private readonly IWaybillPrinting _waybillPrinting;
 
 
         public BoxerController(UserClass userinfo, IConfiguration configuration,
+            IWaybillPrinting waybillPrinting,
             UserClass tokenInfo,
             IWebHostEnvironment webHostEnvironment,
             ILogger<ShopeeController> logger,
@@ -68,6 +71,7 @@ namespace SNR_BGC.Controllers
 
         {
             _userInfoConn = userinfo;
+            _waybillPrinting = waybillPrinting;
             _configuration = configuration;
 
 
@@ -404,7 +408,7 @@ namespace SNR_BGC.Controllers
                 if (boxOrders.Count > 0)
                     order_item_ids.AddRange(boxOrders.Select(s => s.order_item_id).ToList());
 
-                var orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString()).FirstOrDefault();
+                var orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString() && e.platform_status != "canceled").FirstOrDefault();
                 for (var i = 0; i < qty; i++)
                 {
 
@@ -817,7 +821,6 @@ namespace SNR_BGC.Controllers
         }
 
         public async Task<JsonResult> DoneBoxer(CancellationToken stoppingToken, string orderId, string result)
-        
         {
             var shopee_csd = _configuration.GetConnectionString("Myconnection");
             using var shopee_connsd = new SqlConnection(shopee_csd);
@@ -1682,6 +1685,11 @@ namespace SNR_BGC.Controllers
                                 Console.WriteLine(responseContent);
 
                                 var responseContentJson = JObject.Parse(responseContent);
+                                if (responseContentJson["error"].ToString() != "")
+                                {
+                                    shopee_connsd.Close();
+                                    return "Failed";
+                                }
 
                                 var errorLogs = new ErrorLogs();
 
@@ -1709,7 +1717,7 @@ namespace SNR_BGC.Controllers
                                 {
                                     var trackingNumber = (responseJsonTrackingNumber["response"]?["tracking_number"] ?? "").ToString();
 
-
+                                  
                                     var boxOrderTracking = new List<BoxOrders>();
                                     boxOrderTracking = _userInfoConn.boxOrders.Where(e => e.orderId == orderId).ToList();
                                     for (int x = 0; x < boxOrderTracking.Count; x++)
@@ -1718,13 +1726,6 @@ namespace SNR_BGC.Controllers
                                         _userInfoConn.Update(boxOrderTracking[x]);
                                     }
                                     _userInfoConn.SaveChanges();
-                                }
-
-                                if (responseContentJson["error"].ToString() != "")
-                                {
-                                    shopee_connsd.Close();
-                                    return "Failed";
-
                                 }
                             }
                             else

@@ -50,6 +50,27 @@ namespace SNR_BGC.Controllers
 
         }
 
+        public JsonResult ClearRunnerUser(string runnerUser)
+        {
+            try
+            {
+                using var connsd = new SqlConnection(_configuration.GetConnectionString("Myconnection"));
+                connsd.Open();
+                string sqld = $"EXEC sp_ClearRunnerUser @runnerUser='{runnerUser}'";
+                using var command = new SqlCommand(sqld, connsd);
+                command.ExecuteNonQuery();
+                connsd.Close();
+
+                return Json(new { set = "" });
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return Json(new { set = "" });
+
+        }
+
         public JsonResult GetItemCollect()
         {
 

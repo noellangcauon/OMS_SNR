@@ -782,11 +782,12 @@ function onlyUnique(value, index, array) {
 }
 
 function ToPOS() {
-
+    ajaxLoader('show');
     $.ajax({
         type: "POST",
         url: "/Boxer/CheckDiscrepancy?orderId=" + orderId,
     }).done(function (set) {
+        ajaxLoader('hide');
         if (set.set == 'Discrepancy') {
             $("#incorrectOrderModalBtn").click();
 

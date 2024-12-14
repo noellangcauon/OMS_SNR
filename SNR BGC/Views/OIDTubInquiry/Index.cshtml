@@ -3,8 +3,12 @@
     Layout = "~/Views/Shared/CodefoxLayout.cshtml";
 }
 
-
-<!-- Content Column -->
+ @*Content Column*@ 
+<style>
+    .sscroll {
+        overflow: auto;
+    }
+</style>
 
 <section class="section">
     <div class="container-fluid">
@@ -16,8 +20,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="tab-content pt-2" id="">
-                            <div class="tab-pane fade show active" id="" role="tabpanel">
-
+                            <div class="tab-pane fade show active sscroll" id="" role="tabpanel">
                                 <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="oidItems">
                                     <thead>
                                         <tr>
@@ -27,6 +30,8 @@
                                             <th style="white-space: nowrap; color: blue;">Total Amount</th>
                                             <th style="white-space: nowrap; color: blue;">Status</th>
                                             <th style="white-space: nowrap; color: blue;">Date Created</th>
+                                            <th style="white-space: nowrap; color: blue;">Picker User</th>
+                                            <th style="white-space: nowrap; color: blue;">Boxer User</th>
                                             <th style="white-space: nowrap; color: blue;">Picking Start Time</th>
                                             <th style="white-space: nowrap; color: blue;">Picking End Time</th>
                                             <th style="white-space: nowrap; color: blue;">Boxer Start Time</th>

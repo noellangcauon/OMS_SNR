@@ -2741,15 +2741,9 @@ namespace SNR_BGC.Controllers
 
             //await GetCanceledOrderList(access_token);
 
-            //var csd = _configuration.GetConnectionString("Myconnection");
-            //using var connsd = new SqlConnection(csd);
-            //connsd.Open();
-
-            //string sqlddd = $"EXEC DeleteNoHeader @module = 'shopee'";
-            //using var cmdddd = new SqlCommand(sqlddd, connsd);
-            //cmdddd.ExecuteNonQuery();
-            //connsd.Close();
-
+            var connString = _configuration.GetConnectionString("Myconnection");
+            using var sqlConnection = new SqlConnection(connString);
+            sqlConnection.Open();
 
             var ordersCount = 0;
 
@@ -2763,11 +2757,23 @@ namespace SNR_BGC.Controllers
                     dateFrom = DateTime.Today.AddDays(-14);
                 }
 
+                try
+                {
+                    string sqlDNH = $"EXEC DeleteNoHeader @module = 'shopee'";
+                    using var cmdDNH = new SqlCommand(sqlDNH, sqlConnection);
+                    cmdDNH.ExecuteNonQuery();
+                    sqlConnection.Close();
+                }
+                catch (SqlException ex)
+                {
+                    sqlConnection.Close();
+                    return Json(new { set = "Failed to execute the DeleteNoHeader stored procedure. " + ex.ToString(), ordersCount = ordersCount, coverage = coverage, coverageFrom = dateFrom, coverageTo = dateTo });
+
+                }
+
                 var cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88";
                 using var conns = new SqlConnection(cs);
                 conns.Open();
-
-
 
                 var shopee_cs = "Data Source=199.84.0.151;Initial Catalog=SNR_ECOMMERCE;User ID=apps;Password=546@Apps#88;Encrypt=False;";
                 using var shopee_conns = new SqlConnection(shopee_cs);

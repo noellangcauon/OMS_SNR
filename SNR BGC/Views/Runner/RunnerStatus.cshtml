@@ -6,6 +6,12 @@
 
 <!-- Content Column -->
 
+<style>
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+
 <section class="section">
     <div class="container-fluid">
         <div class="page-title-box">
@@ -16,7 +22,21 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="tab-content pt-2" id="">
+                            <div class="col-md-2" style="display: inline-block">
+                                <select id="selectRunner" class="form-select" onchange="SelectRunner()">
+                                    <option value="" disabled selected hidden>Select Runner...</option>
+                                </select>
+                            </div>
+                            <div style="display: inline-block">
+                                <button id="clearButton" class="btn btn-primary" style="display: inline-block" onclick="ClearRunnerUser()" disabled>Clear</button>
+                            </div>
+                            <div class="col-md-2" style="display: inline-block; float:right">
+                                <input type="text" id="searchInput" placeholder="Search..." class="form-control" style="background-color: white !important">
+                            </div>
+
+
                             <div class="tab-pane fade show active" id="" role="tabpanel">
+
 
                                 <table class="table table-sm text-sm nowrap w-100 table-bordered table-striped" id="runnerList">
                                     <thead>
@@ -45,6 +65,28 @@
     </div>
 
 </section>
+
+<div id="clearModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="clearModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl"  style="width: 500px; margin-top: 10%;">
+        <div class="modal-content">
+           
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <label id="clearModalLabel" style="font-weight: bold; font-size: 16px;"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-light close" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="ClearProceed()"><i class="fas fa-check"></i> Clear</button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 
 @section Scripts {
 

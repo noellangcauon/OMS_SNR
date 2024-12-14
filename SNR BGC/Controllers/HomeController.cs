@@ -494,7 +494,8 @@ namespace SNR_BGC.Controllers
                     }
                     else
                     {
-                        result = _userInfoConn.ordersTable.Where(u => u.exception == 1 && u.typeOfexception == "NIB" && u.runnerUser == null).ToList();
+                        result = _userInfoConn.ordersTable.Where(u => u.exception == 1 && u.typeOfexception == "NIB" && u.runnerUser == null).Take(2).ToList(); 
+                        // added take(2) because it is not necessary to take all list since this result is only for "items to collect" notification
 
                         _userInfoConn.Dispose();
                         return Json(new { set = result, user = "Runner" });
@@ -512,13 +513,11 @@ namespace SNR_BGC.Controllers
                 }
                 else if (claims.Claims.ToList()[3].Value.Contains("Boxer"))
                 {
-                    var result = new List<BoxOrders>();
-                    result = _userInfoConn.boxOrders.ToList();
+                    //var result = new List<BoxOrders>();
+                    //result = _userInfoConn.boxOrders.Take(2).ToList();
+                    //_userInfoConn.Dispose();
 
-                    _userInfoConn.Dispose();
-
-
-                    return Json(new { set = result, user = "Boxer" });
+                    return Json(new { set = true, user = "Boxer" });
                 }
                 else
                 {

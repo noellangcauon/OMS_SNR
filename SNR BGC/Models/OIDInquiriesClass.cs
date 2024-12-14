@@ -8,6 +8,8 @@ namespace SNR_BGC.Models
     {
         public int entryNum { get; set; }
         public string orderId { get; set; }
+        public string pickerUser { get; set; }
+        public string boxerUser { get; set; }
         public DateTime? dateFetch { get; set; }
         public string module { get; set; }
         public string oidstatus { get; set; }

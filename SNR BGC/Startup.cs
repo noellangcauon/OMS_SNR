@@ -21,6 +21,8 @@ using Serilog.Events;
 using SNR_BGC.DataAccess;
 using SNR_BGC.Utilities;
 using SNR_BGC.Hubs;
+using SNR_BGC.Interface;
+using SNR_BGC.Services;
 
 namespace SNR_BGC
 {
@@ -122,6 +124,7 @@ namespace SNR_BGC
             services.AddSingleton<IAuthenthicationTokenProvider, AuthenthicationTokenProvider>();
             services.AddSingleton<IDbAccess, DbAccess>();
             services.AddScoped<IDataRepository, DataRepository>();
+            services.AddScoped<IWaybillPrinting, WaybillPrinting>();
             services.AddRazorPages();
 
             //services.AddHostedService<BackgroundWorkerService>();

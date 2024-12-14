@@ -13,7 +13,6 @@ $(document).ready(function () {
 
             $(table).DataTable({
                 "pageLength": 10,
-                "scrollY": '50vh',
                 "responsive": true,
                 "lengthChange": false,
                 "scrollCollapse": true,
@@ -74,6 +73,24 @@ $(document).ready(function () {
                             if (minutes.length < 2)
                                 minutes = '0' + minutes;
                             return data = [month, day, year].join('-') + ' ' + [hours, minutes].join(':');
+                        }
+                    },
+                    {
+                        "data": "pickerUser",
+                        "render": function (data) {
+                            if (data == null)
+                                return '-';
+
+                            return data
+                        }
+                    },
+                    {
+                        "data": "boxerUser",
+                        "render": function (data) {
+                            if (data == null)
+                                return '-';
+                           
+                            return data
                         }
                     },
                     {

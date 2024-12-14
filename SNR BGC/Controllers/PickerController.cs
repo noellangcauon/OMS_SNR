@@ -526,6 +526,8 @@ namespace SNR_BGC.Controllers
                     {
 
                         clearedOrders[i].isNIB = true;
+                        clearedOrders[i].pickerUser = null;
+
                         _userInfoConn.Update(clearedOrders[i]);
 
                         var ordersTable = new List<OrderClass>();
@@ -536,6 +538,8 @@ namespace SNR_BGC.Controllers
                         {
                             ordersTable[j].exception = 1;
                             ordersTable[j].typeOfexception = "NIB";
+                            ordersTable[j].runnerStatus = null;
+                            ordersTable[j].runnerUser = null;
                             _userInfoConn.Update(ordersTable[j]);
 
                         }
