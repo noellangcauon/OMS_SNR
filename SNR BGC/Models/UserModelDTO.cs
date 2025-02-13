@@ -10,6 +10,8 @@ namespace SNR_BGC.Models
         public string fullname { get; set; }
         [Required]
         public string username { get; set; }
+        [Required]
+        public string employeeId { get; set; }
         public string password { get; set; }
         [Required]
         public string role { get; set; }

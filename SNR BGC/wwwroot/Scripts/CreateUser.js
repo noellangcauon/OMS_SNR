@@ -50,6 +50,7 @@ function tableGenerator(table, data) {
             "columns": [
                 { "data": "userId" },
                 { "data": "username" },
+                { "data": "employeeId" },
                 { "data": "userFullname" },
                 { "data": "userRole" },
                 {
@@ -180,6 +181,7 @@ function EditForm(set) {
 
     set.set.accessType == "AD" ? $("#radioADEdit").prop("checked", true) : $("#radioNativeEdit").prop("checked", true)
     $("#txtFullnameEdit").val(set.set.userFullname);
+    $("#txtEmployeeIdEdit").val(set.set.employeeId);
     $("#txtUsernameEdit").val(set.set.username.replace("@snrshopping.com", ""));
     if (set.set.password == null) {
         $("#passwordFieldEdit").hide();
@@ -259,10 +261,11 @@ $(document).on("click", "#radioAD, #radioNative", function () {
 
     var username = $("#txtUsername").val();
     var fullname = $("#txtFullname").val();
+    var employeeId = $("#txtEmployeeId").val();
     var password = $("#txtPassword").val();
     var role = $("#txtRole").val();
     if (isNative) {
-        if (username != "" && fullname != "" && password != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && password != "" && role != "") {
 
             if (password.match(/[A-Z]/) && password.match(/[a-z]/) && password.match(/[0-9]/) && password.match(/[\\@#$-/:-?{-~!"^_`\[\]]/) && password.length >= 8) {
 
@@ -279,7 +282,7 @@ $(document).on("click", "#radioAD, #radioNative", function () {
         }
     }
     else {
-        if (username != "" && fullname != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && role != "") {
 
             $("#btnSave").prop("disabled", false);
         }
@@ -290,16 +293,17 @@ $(document).on("click", "#radioAD, #radioNative", function () {
     }
 });
 
-$(document).on("keyup", "#txtUsername, #txtFullname, #txtPassword", function () {
+$(document).on("keyup", "#txtUsername, #txtFullname, #txtEmployeeId, #txtPassword", function () {
     var isNative = $("#radioNative").prop("checked");
     var username = $("#txtUsername").val();
     var fullname = $("#txtFullname").val();
+    var employeeId = $("#txtEmployeeId").val();
     var password = $("#txtPassword").val();
     var role = $("#txtRole").val();
 
 
     if (isNative) {
-        if (username != "" && fullname != "" && password != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && password != "" && role != "") {
             
             if (password.match(/[A-Z]/) && password.match(/[a-z]/) && password.match(/[0-9]/) && password.match(/[\\@#$-/:-?{-~!"^_`\[\]]/) && password.length >= 8) {
 
@@ -316,7 +320,7 @@ $(document).on("keyup", "#txtUsername, #txtFullname, #txtPassword", function () 
         }
     }
     else {
-        if (username != "" && fullname != ""  && role != "") {
+        if (username != "" && fullname != "" && employeeId != ""  && role != "") {
 
             $("#btnSave").prop("disabled", false);
         }
@@ -380,10 +384,11 @@ $(document).on("change", "#txtRole", function () {
     var isNative = $("#radioNative").prop("checked");
     var username = $("#txtUsername").val();
     var fullname = $("#txtFullname").val();
+    var employeeId = $("#txtEmployeeId").val();
     var password = $("#txtPassword").val();
     var role = $("#txtRole").val();
     if (isNative) {
-        if (username != "" && fullname != "" && password != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && password != "" && role != "") {
 
             if (password.match(/[A-Z]/) && password.match(/[a-z]/) && password.match(/[0-9]/) && password.match(/[\\@#$-/:-?{-~!"^_`\[\]]/) && password.length >= 8) {
 
@@ -400,7 +405,7 @@ $(document).on("change", "#txtRole", function () {
         }
     }
     else {
-        if (username != "" && fullname != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && role != "") {
 
             $("#btnSave").prop("disabled", false);
         }
@@ -462,37 +467,45 @@ function getData(data) {
 }
 function getDataEdit(data) {
 
-    $.ajax({
-        method: "POST",
-        url: '/User/EditUser',
-        data: { userform: data }
-    }).done(function (set) {
-        if (set.set.userId > 0) {
-            $("#closeUserModal").click();
-            Swal.fire(
-                'Succes!',
-                'Successfully added the user',
-                'success'
-            )
+    if ($("#txtEmployeeIdEdit").val() == "") {
+        Swal.fire(
+            'Failed!',
+            "Employee ID is required.",
+            'error'
+        )
+    }
+    else {
+        $.ajax({
+            method: "POST",
+            url: '/User/EditUser',
+            data: { userform: data }
+        }).done(function (set) {
+            if (set.set.userId > 0) {
+                $("#closeUserModal").click();
+                Swal.fire(
+                    'Succes!',
+                    'Updated Successfully',
+                    'success'
+                )
 
-            var si = setInterval(function () {
-                clearInterval(si);
-                document.location = '/User/CreateUser'
-            }, 4000);
-        }
-        else {
+                var si = setInterval(function () {
+                    clearInterval(si);
+                    document.location = '/User/CreateUser'
+                }, 4000);
+            }
+            else {
 
-            Swal.fire(
-                'Failed!',
-                set.set,
-                'error'
-            )
+                Swal.fire(
+                    'Failed!',
+                    set.set,
+                    'error'
+                )
 
-            //window.location.href = '/User/CreateUser';
-        }
-    });
+                //window.location.href = '/User/CreateUser';
+            }
+        });
 
-    ;
+    }
 }
 
 $(document).on("click", "#btnSave", function () {
@@ -500,6 +513,7 @@ $(document).on("click", "#btnSave", function () {
 
         accessType: $("#radioAD").prop("checked") ? "AD" : "Native",
         fullname: $("#txtFullname").val(),
+        employeeId: $("#txtEmployeeId").val(),
         username: $("#txtUsername").val(),
         password: $("#txtPassword").val(),
         role: $("#txtRole").val(),
@@ -519,6 +533,7 @@ $(document).on("click", "#btnUpdate", function () {
         userId: idToEdit,
         accessType: $("#radioADEdit").prop("checked") ? "AD" : "Native",
         fullname: $("#txtFullnameEdit").val(),
+        employeeId: $("#txtEmployeeIdEdit").val(),
         username: $("#txtUsernameEdit").val(),
         password: $("#txtPasswordEdit").val(),
        /* password: isPasswordChange ? $("#txtPasswordEdit").val() : null,*/
@@ -537,12 +552,13 @@ $(document).on("keyup", "#txtPasswordEdit", function () {
     var isNative = $("#radioNativeEdit").prop("checked");
     var username = $("#txtUsernameEdit").val();
     var fullname = $("#txtFullnameEdit").val();
+    var employeeId = $("#txtEmployeeIdEdit").val();
     var password = $("#txtPasswordEdit").val();
     var role = $("#txtRoleEdit").val();
 
 
     if (isNative) {
-        if (username != "" && fullname != "" && password != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && password != "" && role != "") {
             
             if (password.match(/[A-Z]/) && password.match(/[a-z]/) && password.match(/[0-9]/) && password.match(/[\\@#$-/:-?{-~!"^_`\[\]]/) && password.length >= 8) {
 
@@ -559,7 +575,7 @@ $(document).on("keyup", "#txtPasswordEdit", function () {
         }
     }
     else {
-        if (username != "" && fullname != ""  && role != "") {
+        if (username != "" && fullname != "" && employeeId != ""  && role != "") {
 
             $("#btnUpdate").prop("disabled", false);
         }
@@ -623,10 +639,11 @@ $(document).on("change", "#txtRoleEdit", function () {
     var isNative = $("#radioNativeEdit").prop("checked");
     var username = $("#txtUsernameEdit").val();
     var fullname = $("#txtFullnameEdit").val();
+    var employeeId = $("#txtEmployeeIdEdit").val();
     var password = $("#txtPasswordEdit").val();
     var role = $("#txtRoleEdit").val();
     if (isNative) {
-        if (username != "" && fullname != "" && password != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && password != "" && role != "") {
 
             if (password.match(/[A-Z]/) && password.match(/[a-z]/) && password.match(/[0-9]/) && password.match(/[\\@#$-/:-?{-~!"^_`\[\]]/) && password.length >= 8) {
 
@@ -643,7 +660,7 @@ $(document).on("change", "#txtRoleEdit", function () {
         }
     }
     else {
-        if (username != "" && fullname != "" && role != "") {
+        if (username != "" && fullname != "" && employeeId != "" && role != "") {
 
             $("#btnUpdate").prop("disabled", false);
         }

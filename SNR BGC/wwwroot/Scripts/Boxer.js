@@ -459,6 +459,27 @@ function ScanQRPrinter() {
                         }
                     });
                 }
+                else if (set.hasSystemError == 'SystemErrorPack') {
+                    Swal.fire({
+                        title: 'Opps!',
+                        text: 'System error, please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        // This code block will be executed only if the user clicks "OK"
+                        if (result.isConfirmed) {
+                            var si = setInterval(function () {
+                                clearInterval(si);
+                                document.location = '/'
+                            }, 1000);
+                        } else if (result.dismiss) {
+                            var si = setInterval(function () {
+                                clearInterval(si);
+                                document.location = '/'
+                            }, 1000);
+                        }
+                    });
+                }
                 else {
                     Swal.fire({
                         title: 'Opps!',

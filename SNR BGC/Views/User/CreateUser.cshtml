@@ -54,6 +54,7 @@
 
                                     <th style="white-space: nowrap; color: blue;">ID</th>
                                     <th style="white-space: nowrap; color: blue;">Username</th>
+                                    <th style="white-space: nowrap; color: blue;">Employee ID</th>
                                     <th style="white-space: nowrap; color: blue;">Fullname</th>
                                     <th style="white-space: nowrap; color: blue;">Role</th>
                                     <th style="white-space: nowrap; color: blue;">Access Type</th>
@@ -106,6 +107,11 @@
                         <div class="form-group">
                             <label class="control-label">Fullname <span class="text-danger">*</span></label>
                             <input name="fullname" id="txtFullname" class="form-control" required />
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Employee ID <span class="text-danger">*</span></label>
+                            <input name="employeeId" id="txtEmployeeId" class="form-control" required />
                             <span class="text-danger"></span>
                         </div>
                         <div class="form-group">
@@ -239,6 +245,11 @@
                                     </div>
                                 </div>
 
+                                <span class="text-danger"></span> 
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Employee ID <span class="text-danger">*</span></label>
+                                <input name="employeeid" id="txtEmployeeIdEdit" class="form-control" />
                                 <span class="text-danger"></span>
                             </div>
                             <div class="form-group" id="passwordFieldEdit">
@@ -291,7 +302,7 @@
                             <div class="row">
                                 <div class="col-md-11">
                                 </div>
-                               
+
                             </div>
                             @if (!string.IsNullOrEmpty(error))
                             {
@@ -300,12 +311,12 @@
                                 </div>
 
                             }
-                             <div class="modal-footer">
+                            <div class="modal-footer">
 
                                 <div class="col-md-1">
                                     <input type="submit" value="Update" class="btn btn-primary" id="btnUpdate" />
                                 </div>
-            </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -464,7 +464,7 @@ function tableGeneratorView(table, trans) {
 ##############################################
 */
 generateCodes = function () {
-    var url = 'https://auth.lazada.com/oauth/authorize?response_type=code&force_auth=true&redirect_uri=https://127.0.0.1:5001/Token/VerifyLazadaToken&client_id=107315';
+    var url = 'https://auth.lazada.com/oauth/authorize?response_type=code&force_auth=true&redirect_uri=https://lazpee.snrshopping.com/Token/VerifyLazadaToken&client_id=107315';
     window.open(url);
 
 }

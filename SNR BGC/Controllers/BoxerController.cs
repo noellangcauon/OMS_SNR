@@ -415,7 +415,7 @@ namespace SNR_BGC.Controllers
                     if (orderItem.module.ToLower() == "lazada")
                     {
                         if (order_item_ids.Count > 0)
-                            orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString() && !order_item_ids.Contains(e.order_item_id)).FirstOrDefault();
+                            orderTable = _userInfoConn.ordersTable.Where(e => e.orderId == orderId && e.sku_id == skuresult.ToString() && e.platform_status != "canceled" && !order_item_ids.Contains(e.order_item_id)).FirstOrDefault();
                     }
 
                     var orderItemId = orderTable != null ? orderTable.order_item_id : null;
@@ -932,17 +932,30 @@ namespace SNR_BGC.Controllers
                         List<OrderItemListClass> orderItemList = orderItemListArray.ToObject<List<OrderItemListClass>>();
                         for (int x = 0; x < boxOrderTracking.Count; x++)
                         {
-                            if (string.IsNullOrEmpty(boxOrderTracking[x].order_item_id))
+                            if (responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["item_err_code"].ToString() == "0")
                             {
-                                boxOrderTracking[x].trackingNo = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["tracking_number"].ToString();
-                                boxOrderTracking[x].package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
-                                _userInfoConn.Update(boxOrderTracking[x]);
+                                if (string.IsNullOrEmpty(boxOrderTracking[x].order_item_id))
+                                {
+                                    boxOrderTracking[x].trackingNo = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["tracking_number"].ToString();
+                                    boxOrderTracking[x].package_id = responseJson["result"]["data"]["pack_order_list"][0]["order_item_list"][x]["package_id"].ToString();
+                                    _userInfoConn.Update(boxOrderTracking[x]);
+                                }
+                                else
+                                {
+                                    boxOrderTracking[x].trackingNo = orderItemList.Where(w => w.order_item_id == boxOrderTracking[x].order_item_id).Select(s => s.tracking_number).FirstOrDefault();
+                                    boxOrderTracking[x].package_id = orderItemList.Where(w => w.order_item_id == boxOrderTracking[x].order_item_id).Select(s => s.package_id).FirstOrDefault();
+                                    _userInfoConn.Update(boxOrderTracking[x]);
+                                }
                             }
                             else
                             {
-                                boxOrderTracking[x].trackingNo = orderItemList.Where(w => w.order_item_id == boxOrderTracking[x].order_item_id).Select(s => s.tracking_number).FirstOrDefault();
-                                boxOrderTracking[x].package_id = orderItemList.Where(w => w.order_item_id == boxOrderTracking[x].order_item_id).Select(s => s.package_id).FirstOrDefault();
-                                _userInfoConn.Update(boxOrderTracking[x]);
+                                connsd.Close();
+                                shopee_connsd.Close();
+                                return Json(new
+                                {
+                                    set = "Failed",
+                                    hasSystemError = "SystemErrorPack"
+                                });
                             }
                         }
                         _userInfoConn.SaveChanges();

@@ -330,9 +330,7 @@ namespace SNR_BGC.Controllers
                 orderTable[i].collectingEndTime = null;
                 orderTable[i].transferringStartTime = null;
                 orderTable[i].transferringEndTime = null;
-                orderTable[i].exception = 1;
                 _userInfoConn.Update(orderTable[i]);
-                _userInfoConn.SaveChanges();
             }
 
             orderTableHeader = _userInfoConn.orderTableHeader.Where(e => e.orderId == orderId).FirstOrDefault();
@@ -340,28 +338,22 @@ namespace SNR_BGC.Controllers
             orderTableHeader.exception = 1;
             _userInfoConn.Update(orderTableHeader);
 
-
             clearedOrder = _userInfoConn.clearedOrders.Where(e => e.orderId == orderId && e.skuId == sku).ToList();
             for (int k = 0; k < clearedOrder.Count; k++)
             {
                 clearedOrder[k].isNIB = true;
                 clearedOrder[k].NIBUser = user;
-                _userInfoConn.Update(orderTableHeader);
+                _userInfoConn.Update(clearedOrder[k]);
             }
-
-            _userInfoConn.SaveChanges();
 
             var clearedOrder2 = new List<ClearedOrders>();
             clearedOrder2 = _userInfoConn.clearedOrders.Where(e => e.orderId == orderId).ToList();
             for (int j = 0; j < clearedOrder2.Count; j++)
             {
                 clearedOrder2[j].pickerUser = null;
-                _userInfoConn.Update(orderTableHeader);
+                _userInfoConn.Update(clearedOrder2[j]);
             }
-
             _userInfoConn.SaveChanges();
-
-
 
 
             var exceptionItems = new ExceptionItems();
@@ -399,7 +391,7 @@ namespace SNR_BGC.Controllers
             //var items = new List<OrderClass>();
             //items = _userInfoConn.ordersTable.Where(e => e.typeOfexception == "NIB").ToList();
 
-                //conns.Close();
+            //conns.Close();
             return Json(new { set = upcresult });
         }
         public JsonResult DonePicker(PickerOrderQr pickerQrClass)
@@ -498,7 +490,7 @@ namespace SNR_BGC.Controllers
             //else
             //{
 
-                return Json(new { set = clearedOrders, message = "SuccessComplete" });
+            return Json(new { set = clearedOrders, message = "SuccessComplete" });
             //}
 
 
@@ -544,6 +536,7 @@ namespace SNR_BGC.Controllers
 
                         }
                         ordersTableHeader.exception = 1;
+                        ordersTableHeader.status = "NIB";
                         _userInfoConn.Update(ordersTableHeader);
 
 

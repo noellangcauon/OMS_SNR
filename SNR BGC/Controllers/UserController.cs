@@ -28,11 +28,23 @@ namespace SNR_BGC.Controllers
 
         public IActionResult AddUser()
         {
-            return View();
+            var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+            var role = claims.Claims.ToList()[2].Value;
+
+            if (role == "User")
+                return View("ErrorAccess");
+            else
+                return View();
         }
         public IActionResult CreateUser()
         {
-            return View();
+            var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+            var role = claims.Claims.ToList()[2].Value;
+
+            if (role == "User")
+                return View("ErrorAccess");
+            else
+                return View();
         }
         [HttpPost]
         public IActionResult CreateNewUser(UserModelDTO userform)
@@ -314,11 +326,16 @@ namespace SNR_BGC.Controllers
 
                 if (checkUser == null)
                 {
+                    var employeeId = _userInfoConn.usersTable.Where(w => w.employeeId == userform.employeeId).FirstOrDefault();
+                    if (employeeId != null)
+                        return Json(new { set = "Employee ID is already exist." });
+
                     var userstbl = new UsersTable();
                     var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
 
                     userstbl.accessType = userform.accessType;
                     userstbl.userFullname = userform.fullname;
+                    userstbl.employeeId = userform.employeeId;
                     userstbl.username = userform.username + "@snrshopping.com";
                     userstbl.password = userform.accessType == "AD" ? null : EncryptorDecryptor.Encrypt(userform.password);
                     userstbl.userRole = userform.role;
@@ -357,6 +374,9 @@ namespace SNR_BGC.Controllers
         {
             try
             {
+                var employeeId = _userInfoConn.usersTable.Where(w => w.employeeId == userform.employeeId && w.userId != userform.userId).FirstOrDefault();
+                if (employeeId != null)
+                    return Json(new { set = "Employee ID is already exist." });
 
                 var userstbl = new UsersTable();
                 var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
@@ -365,6 +385,7 @@ namespace SNR_BGC.Controllers
                 userstbl.accessType = userform.accessType;
                 userstbl.userFullname = userform.fullname;
                 userstbl.username = userform.username + "@snrshopping.com";
+                userstbl.employeeId = userform.employeeId;
                 userstbl.password = userform.password == null ? null : EncryptorDecryptor.Encrypt(userform.password);
                 userstbl.userRole = userform.role;
                 userstbl.withOmsAccess = userform.oms;

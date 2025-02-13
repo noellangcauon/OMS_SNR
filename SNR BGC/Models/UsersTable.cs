@@ -26,5 +26,6 @@ namespace SNR_BGC.Models
         public string? lastEditValue { get; set; }
         public bool? withBoxerAccess { get; set; }
         public bool? newUser { get; set; }
+        public string? employeeId { get; set; }
     }
 }
