@@ -853,7 +853,7 @@ namespace SNR_BGC.Controllers
                     return Json(new { set = "CancelledOrders" });
                 }
 
-                
+
 
                 string shopee_sql_token = "SELECT TOP 1 accessToken FROM shopeeToken order by entryId Desc";
                 using var shopee_cmd_token = new SqlCommand(shopee_sql_token, shopee_connsd);
@@ -1081,37 +1081,36 @@ namespace SNR_BGC.Controllers
                         //request2.AddApiParameter("readyToShipReq", "{\"packages\":[{\"package_id\":"+ package_id +"}]}");
                         request2.AddApiParameter("readyToShipReq", arrayResult);
                         LazopResponse response2 = client2.Execute(request2, accessToken);
+                        var objRes2 = response2.Body;
+                        JObject respJson2 = JObject.Parse(objRes2);
                         Console.WriteLine(response2.IsError());
                         Console.WriteLine(response2.Body);
 
-
-                        string logs = response2.Body;
-
-                        if (logs.Contains("40010"))
+                        if (respJson2["result"]?["error_code"] != null)
                         {
                             ILazopClient client3 = new LazopClient(url, appkey, appSecret);
                             LazopRequest request3 = new LazopRequest();
                             request3.SetApiName("/order/package/rts");
                             request3.AddApiParameter("readyToShipReq", arrayResult);
                             LazopResponse response3 = client3.Execute(request3, accessToken);
+                            var objRes3 = response3.Body;
+                            JObject respJson3 = JObject.Parse(objRes3);
                             Console.WriteLine(response3.IsError());
                             Console.WriteLine(response3.Body);
 
-                            string logs2 = response3.Body;
-
-                            if (logs2.Contains("40010"))
+                            if (respJson3["result"]?["error_code"] != null)
                             {
                                 ILazopClient client4 = new LazopClient(url, appkey, appSecret);
                                 LazopRequest request4 = new LazopRequest();
                                 request4.SetApiName("/order/package/rts");
                                 request4.AddApiParameter("readyToShipReq", arrayResult);
                                 LazopResponse response4 = client4.Execute(request4, accessToken);
+                                var objRes4 = response4.Body;
+                                JObject respJson4 = JObject.Parse(objRes4);
                                 Console.WriteLine(response4.IsError());
                                 Console.WriteLine(response4.Body);
 
-
-                                string logs3 = response4.Body;
-                                if (logs3.Contains("40010"))
+                                if (respJson4["result"]?["error_code"] != null)
                                 {
                                     connsd.Close();
                                     shopee_connsd.Close();
@@ -1541,7 +1540,7 @@ namespace SNR_BGC.Controllers
 
         public async Task<string> GetShipmentList(string access_token, string orderId)
         {
-
+            
 
 
             using (LogContext.PushProperty("Scope", "Shopee Api"))
@@ -1729,8 +1728,12 @@ namespace SNR_BGC.Controllers
                                 if (responseJsonTrackingNumber.ContainsKey("message"))
                                 {
                                     var trackingNumber = (responseJsonTrackingNumber["response"]?["tracking_number"] ?? "").ToString();
+                                    if (string.IsNullOrEmpty(trackingNumber))
+                                    {
+                                        shopee_connsd.Close();
+                                        return "Failed";
+                                    }
 
-                                  
                                     var boxOrderTracking = new List<BoxOrders>();
                                     boxOrderTracking = _userInfoConn.boxOrders.Where(e => e.orderId == orderId).ToList();
                                     for (int x = 0; x < boxOrderTracking.Count; x++)
@@ -1739,6 +1742,11 @@ namespace SNR_BGC.Controllers
                                         _userInfoConn.Update(boxOrderTracking[x]);
                                     }
                                     _userInfoConn.SaveChanges();
+
+                                    //string shippingDocumentType = await _waybillPrinting.GetShippingDocumentParameter(access_token, orderId, packagenumber);
+                                    //await _waybillPrinting.CreateShippingDocument(access_token, orderId, packagenumber, trackingNumber, shippingDocumentType);
+                                    //await _waybillPrinting.GetShippingDocumentResult(access_token, orderId, packagenumber, shippingDocumentType);
+                                    //await _waybillPrinting.DownloadShippingDocument(access_token, orderId, packagenumber, shippingDocumentType);
                                 }
                             }
                             else
@@ -1755,6 +1763,9 @@ namespace SNR_BGC.Controllers
 
                                 _userInfoConn.Add(errorLogs);
                                 _userInfoConn.SaveChanges();
+
+                                shopee_connsd.Close();
+                                return "Failed";
                             }
 
                         }

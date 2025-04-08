@@ -284,6 +284,13 @@ namespace SNR_BGC.Controllers
 
                         if (subModule != null)
                         {
+                            if (userTable.userStatus.ToUpper() == "INACTIVE")
+                            {
+                                TempData["Error"] = "Failed";
+                                connsd.Close();
+                                return View("login");
+                            }
+
                             var uinfos =
                             (from uinfo in _userInfoConn.usersTable
                              where uinfo.username == username
@@ -326,6 +333,13 @@ namespace SNR_BGC.Controllers
 
                     if (userTable != null)
                     {
+                        if (userTable.userStatus.ToUpper() == "INACTIVE")
+                        {
+                            TempData["Error"] = "Failed";
+                            ViewData["ReturnUrl"] = returnUrl;
+                            return View("login");
+                        }
+
                         //if (username == "autoreload@snrshopping.com")
                         //{
                         //    string hostName = Dns.GetHostName();

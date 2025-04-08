@@ -8,6 +8,8 @@ using SNR_BGC.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -40,10 +42,13 @@ namespace SNR_BGC.Services
 
             var array = new
             {
-                order_list = new
+                order_list = new[]
                 {
-                    order_sn = orderId,
-                    package_number = packageNumber
+                    new
+                    {
+                        order_sn = orderId
+                        //package_number = packageNumber
+                    }
                 }
             };
 
@@ -117,12 +122,15 @@ namespace SNR_BGC.Services
 
             var array = new
             {
-                order_list = new
+                order_list = new[]
                 {
-                    order_sn = orderId,
-                    package_number = packageNumber,
-                    tracking_number = trackingNumber,
-                    shipping_document_type = shippingDocumentType
+                    new
+                    {
+                        order_sn = orderId,
+                        //package_number = packageNumber,
+                        tracking_number = trackingNumber,
+                        shipping_document_type = shippingDocumentType
+                    }
                 }
             };
 
@@ -194,11 +202,14 @@ namespace SNR_BGC.Services
 
             var array = new
             {
-                order_list = new
+                order_list = new[]
                 {
-                    order_sn = orderId,
-                    package_number = packageNumber,
-                    shipping_document_type = shippingDocumentType
+                    new
+                    {
+                        order_sn = orderId,
+                        //package_number = packageNumber,
+                        shipping_document_type = shippingDocumentType
+                    }
                 }
             };
 
@@ -271,10 +282,13 @@ namespace SNR_BGC.Services
             var array = new
             {
                 shipping_document_type = shippingDocumentType,
-                order_list = new
+                order_list = new[]
                 {
-                    order_sn = orderId,
-                    package_number = packageNumber
+                    new
+                    {
+                        order_sn = orderId
+                        //package_number = packageNumber,
+                    }
                 }
             };
 
@@ -312,30 +326,41 @@ namespace SNR_BGC.Services
 
 
                     // Read the response content
-                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
-                    var responseContentJson = JObject.Parse(responseContent);
+                    byte[] fileBytes = await httpResponse.Content.ReadAsByteArrayAsync();
                     stopwatch.Stop();
+                    string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DownloadedFile.pdf");
+                    string filePath1 = @"C:\Users\nlangcauon\Desktop\DownloadedFile.pdf";
+                    await File.WriteAllBytesAsync(filePath, fileBytes);
+                    string printerName = @"\\199.85.2.18\EPSON L3110 Series";
+                    string printerName1 = @"Microsoft Print to PDF";
 
-                    if (responseContentJson.ContainsKey("message"))
+                    //ProcessStartInfo psi = new ProcessStartInfo
+                    //{
+                    //    FileName = @"C:\Program Files\Adobe\Acrobat DC\Acrobat\Acrobat.exe",
+                    //    Arguments = $"/t \"{filePath1}\" \"{printerName}\"",
+                    //    CreateNoWindow = true,
+                    //    UseShellExecute = false
+                    //};
+
+                    //using (Process process = new Process { StartInfo = psi })
+                    //{
+                    //    process.Start();
+                    //    process.WaitForExit();
+                    //}
+
+                    var sumatraPath = @"C:\Users\nlangcauon\AppData\Local\SumatraPDF\SumatraPDF.exe"; // Path to SumatraPDF
+
+                    var psi = new ProcessStartInfo
                     {
-                        return responseContentJson["message"].ToString();
-                    }
-                    else
+                        FileName = sumatraPath,
+                        Arguments = $"-print-to \"{printerName}\" -print-settings \"noscale\" -silent \"{filePath1}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    using (var process = Process.Start(psi))
                     {
-                        if (responseContentJson.ContainsKey("waybill"))
-                        {
-                            // Get the file content (assuming it's base64 encoded)
-                            var base64FileContent = responseContentJson["waybill"].ToString();
-
-                            // Decode the base64 string to a byte array
-                            byte[] fileBytes = Convert.FromBase64String(base64FileContent);
-
-                            // Define the path and file name to save it locally
-                            string filePath = Path.Combine(Environment.CurrentDirectory, "DownloadedFile.pdf"); // Change extension as needed
-
-                            // Save the byte array to a file
-                            await File.WriteAllBytesAsync(filePath, fileBytes);
-                        }
+                        process.WaitForExit();
                     }
                 }
                 catch (Exception ex)
