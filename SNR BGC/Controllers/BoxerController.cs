@@ -1627,7 +1627,12 @@ namespace SNR_BGC.Controllers
                             using HttpClient client2 = new HttpClient();
 
                             var address_id = (int)(responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["address_id"] ?? "");
-                            var timeSlotCount = responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["time_slot_list"].Count();
+                            var addressList = responseJsonShippingParam["response"]?["pickup"]?["address_list"];
+                            int? timeSlotCount = null;
+
+                            var timeSlotList = addressList?[0]?["time_slot_list"];
+                            if (timeSlotList != null)
+                                timeSlotCount = responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["time_slot_list"].Count();
                             //var pickup_time_id = (responseJsonShippingParam["response"]?["pickup"]?["address_list"]?[0]?["time_slot_list"]?[timeSlotCount - 1]?["pickup_time_id"] ?? "").ToString();
 
                             var pickup_time_id = "";
