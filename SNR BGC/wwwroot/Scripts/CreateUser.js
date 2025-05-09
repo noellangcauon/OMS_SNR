@@ -13,19 +13,25 @@ $(document).ready(function () {
 });
 
 function getList() {
+    $('#loader').show();
+    $('#usersTable').DataTable().clear().destroy();
     $.ajax({
         method: "GET",
         url: '/User/GetUsers',
     }).done(function (set) {
         tableGenerator('#usersTable', set);
+        $('#loader').hide();
     });
 }
 function getListInactive() {
+    $('#loader').show();
+    $('#usersTable').DataTable().clear().destroy();
     $.ajax({
         method: "GET",
         url: '/User/GetUsersInactive',
     }).done(function (set) {
         tableGenerator('#usersTable', set);
+        $('#loader').hide();
     });
 }
 
@@ -83,7 +89,7 @@ function tableGenerator(table, data) {
                 {
                     "data": "userStatus",
                     "render": function (data, type, row) {
-                        return data = buttonGeneratorDraft(row.userId)
+                        return data = buttonGeneratorDraft(row.userId, row.employeeId)
                     }
                 },
             ]
@@ -110,10 +116,16 @@ function tableGenerator(table, data) {
 }
 
 
-function buttonGeneratorDraft(id) {
+function buttonGeneratorDraft(id, empId) {
     return '<div class="btn-group btn-sm" role="group">' +
         ($("#btnActive").hasClass("active") ?'<button type="button" class="btn btn-warning btn-sm" onclick="redirectToEdit(' + id + ')"><i class="bi bi-pencil"></i>&nbsp;Edit</button>':'' )+
-        ($("#btnActive").hasClass("active") ? '<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deactivateModal" onclick="redirectToDeactivate(' + id + ')"><i class="bi bi-slash-circle"></i>&nbsp;Deactivate</button>' : '<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#ActivateModal" onclick="redirectToActivate(' + id + ')"><i class="bi bi-check2-circle"></i>&nbsp;Activate</button>') +
+        ($("#btnActive").hasClass("active") ?
+        '<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deactivateModal" onclick="redirectToDeactivate(' + id + ')"><i class="bi bi-slash-circle"></i>&nbsp;Deactivate</button>'
+        :
+        empId == null ?
+            '<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#ActivateModal_EditEmployeeId" onclick="redirectToActivate(' + id + ')"><i class="bi bi-check2-circle"></i>&nbsp;Activate</button>'
+            :
+            '<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#ActivateModal" onclick="redirectToActivate(' + id + ')"><i class="bi bi-check2-circle"></i>&nbsp;Activate</button>') +
         '</div>';
 
 }
@@ -128,6 +140,9 @@ function redirectToActivate(id) {
 }
 function cancelActivate() {
     idToActivate = "";
+}
+function EditUserToActivate() {
+    redirectToEdit(idToActivate);
 }
 function deactivateUser() {
     if (idToDeact != "") {

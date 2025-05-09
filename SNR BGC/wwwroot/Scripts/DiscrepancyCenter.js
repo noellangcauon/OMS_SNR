@@ -59,7 +59,7 @@ function tableGenerator(table, data, flag) {
             "lengthChange": false,
             "scrollCollapse": true,
             "paging": true,
-            "searching": false,
+            "searching": true,
             "data": data.set,
             "columns": [
 
@@ -86,7 +86,7 @@ function tableGenerator(table, data, flag) {
             "scrollY": '50vh',
             "responsive": true,
             "lengthChange": false,
-            "searching": false,
+            "searching": true,
             "scrollX": true,
             "scrollCollapse": true,
             "paging": true,

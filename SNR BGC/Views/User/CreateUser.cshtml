@@ -64,6 +64,9 @@
                             </thead>
                             <tbody></tbody>
                         </table>
+                        <div id="loader" style="display: none; text-align: center; margin: 20px;">
+                            <span>Loading Users...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -339,6 +342,23 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" onclick="cancel()" data-dismiss="modal">Cancel</button>
                 <button id="logout" type="button" onclick="deactivateUser()" class="btn btn-primary" data-dismiss="modal">Deactivate</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-example-modal-lg" id="ActivateModal_EditEmployeeId" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Activate User</h5>
+                <button class="close" onclick="cancelActivate()" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Employee ID is missing. Please update the Employee ID before proceeding with activation.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="cancelActivate()" data-dismiss="modal">Cancel</button>
+                <button id="logout" type="button" onclick="EditUserToActivate()" class="btn btn-primary" data-dismiss="modal">Edit User</button>
             </div>
         </div>
     </div>

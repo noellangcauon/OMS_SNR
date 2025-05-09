@@ -1555,6 +1555,7 @@ function tableOrderItem(table, data, flag, isNew) {
 
                 { "data": "total_amount" },
 
+                { "data": "pickerUser" },
 
                 {
                     "data": "orderId",
