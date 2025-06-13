@@ -67,7 +67,20 @@ function tableGenerator(table, data) {
             }],
             "columns": [
                 
-                { "data": "orderId" },
+                {
+                    "data": "orderId",
+                    "render": function (data, type, row, meta) {
+                        // Display normally in table
+                        if (type === 'display') {
+                            return data;
+                        }
+                        // Export as text (with apostrophe to preserve full number)
+                        if (type === 'myExport') {
+                            return "'" + data;
+                        }
+                        return data;
+                    }
+                },
                 {
                     "data": "boxerEndTime",
                     "render": function (data) {
