@@ -1170,10 +1170,18 @@ namespace SNR_BGC.Controllers
                 }
                 else
                 {
-                    var printerExe = new printerExeClass();
-                    printerExe = _userInfoConn.printerExe.Where(e => e.printer == result && e.platform == module).FirstOrDefault();
+                    string trackingNo = await GetShopeeTrackingNo(access_token.ToString(), orderId);
 
-                    apiUrl = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&accessToken={access_token.ToString()}&partnerKey={partnerKey}&partnerId={partnerId}&shopId={shopId}&filepath={printerExe.filepath}";
+                    string shippingDocumentType = await _waybillPrinting.GetShippingDocumentParameter(access_token.ToString(), orderId, null);
+                    await _waybillPrinting.CreateShippingDocument(access_token.ToString(), orderId, null, trackingNo, shippingDocumentType);
+                    var response = await _waybillPrinting.GetShippingDocumentResult(access_token.ToString(), orderId, null, shippingDocumentType);
+                    if (string.IsNullOrEmpty(response))
+                        await _waybillPrinting.DownloadShippingDocument(access_token.ToString(), orderId, null, shippingDocumentType, result);
+
+                    //var printerExe = new printerExeClass();
+                    //printerExe = _userInfoConn.printerExe.Where(e => e.printer == result && e.platform == module).FirstOrDefault();
+
+                    //apiUrl = $"http://199.84.17.110:195/api/OrderPrint/GetOrderPrint?orderPrint={orderId}&printerName={result}&module={module}&accessToken={access_token.ToString()}&partnerKey={partnerKey}&partnerId={partnerId}&shopId={shopId}&filepath={printerExe.filepath}";
 
                 }
                 using (HttpClient client = new HttpClient())

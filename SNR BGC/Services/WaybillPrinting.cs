@@ -194,7 +194,7 @@ namespace SNR_BGC.Services
 
             return response;
         }
-
+        //If Processing, then retry up to 10x. don't proceed to DownloadShippingDocument.
         public async Task<string> GetShippingDocumentResult(string access_token, string orderId, string packageNumber, string shippingDocumentType)
         {
             string response = string.Empty;
@@ -259,8 +259,8 @@ namespace SNR_BGC.Services
                     _userInfoConn.SaveChanges();
 
                     stopwatch.Stop();
-                    var message = responseContentJson["message"].ToString();
-                    if (message != "")
+                    var message = responseContentJson["response"]["result_list"][0]["status"].ToString();
+                    if (message != "READY")
                     {
                         return message;
                     }
@@ -274,7 +274,7 @@ namespace SNR_BGC.Services
             return response;
         }
 
-        public async Task<string> DownloadShippingDocument(string access_token, string orderId, string packageNumber, string shippingDocumentType)
+        public async Task<string> DownloadShippingDocument(string access_token, string orderId, string packageNumber, string shippingDocumentType, string printerName)
         {
             string response = string.Empty;
             string jsonPayload = string.Empty;
@@ -328,32 +328,16 @@ namespace SNR_BGC.Services
                     // Read the response content
                     byte[] fileBytes = await httpResponse.Content.ReadAsByteArrayAsync();
                     stopwatch.Stop();
-                    string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DownloadedFile.pdf");
-                    string filePath1 = @"C:\Users\nlangcauon\Desktop\DownloadedFile.pdf";
+                    string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{orderId}.pdf");
                     await File.WriteAllBytesAsync(filePath, fileBytes);
-                    string printerName = @"\\199.85.2.18\EPSON L3110 Series";
-                    string printerName1 = @"Microsoft Print to PDF";
-
-                    //ProcessStartInfo psi = new ProcessStartInfo
-                    //{
-                    //    FileName = @"C:\Program Files\Adobe\Acrobat DC\Acrobat\Acrobat.exe",
-                    //    Arguments = $"/t \"{filePath1}\" \"{printerName}\"",
-                    //    CreateNoWindow = true,
-                    //    UseShellExecute = false
-                    //};
-
-                    //using (Process process = new Process { StartInfo = psi })
-                    //{
-                    //    process.Start();
-                    //    process.WaitForExit();
-                    //}
+                    //string printerName = @"";
 
                     var sumatraPath = @"C:\Users\nlangcauon\AppData\Local\SumatraPDF\SumatraPDF.exe"; // Path to SumatraPDF
 
                     var psi = new ProcessStartInfo
                     {
                         FileName = sumatraPath,
-                        Arguments = $"-print-to \"{printerName}\" -print-settings \"noscale\" -silent \"{filePath1}\"",
+                        Arguments = $"-print-to \"{printerName}\" -print-settings \"noscale\" -silent \"{filePath}\"",
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
