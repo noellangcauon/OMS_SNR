@@ -142,10 +142,24 @@
                         </form>
                         @if (!string.IsNullOrEmpty(error))
                         {
-                            <div class="alert alert-danger" style="margin-top:2%;">
-                                <strong>Failed to Login!</strong> Please input correct username and password.
-                            </div>
-
+                            @if (error == "inactive")
+                            {
+                                <div class="alert alert-danger" style="margin-top:2%;">
+                                    <strong>Failed to Login!</strong> Inactive user.
+                                </div>
+                            }
+                            else if (error == "maxfailedattempts")
+                            {
+                                <div class="alert alert-danger" style="margin-top:2%;">
+                                    <strong>Failed to Login!</strong> Account locked due to failed attempts.
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger" style="margin-top:2%;">
+                                    <strong>Failed to Login!</strong> Please input correct username and password.
+                                </div>
+                            }
                         }
 
 

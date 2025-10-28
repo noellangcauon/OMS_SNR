@@ -52,6 +52,8 @@ namespace SNR_BGC.Models
         public DbSet<AutoReloadLogs> AutoReloadLogs { get; set; }
         public DbSet<ItemUPC> ItemUPC { get; set; }
         public DbSet<ECommerceStatus> ECommerceStatus { get; set; }
+        public DbSet<PasswordHistory> PasswordHistory { get; set; }
+        public DbSet<AuditLogs> AuditLogs { get; set; }
 
 
 

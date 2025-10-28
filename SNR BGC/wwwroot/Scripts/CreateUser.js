@@ -402,6 +402,20 @@ $(document).on("change", "#txtRole", function () {
     var employeeId = $("#txtEmployeeId").val();
     var password = $("#txtPassword").val();
     var role = $("#txtRole").val();
+
+    if (role == "Administrator") {
+        $("#chkOms").prop("checked", true);
+        $("#chkRunner").prop("checked", false);
+        $("#chkPicker").prop("checked", false);
+        $("#chkBoxer").prop("checked", false);
+    }
+    else {
+        $("#chkOms").prop("checked", false);
+        $("#chkRunner").prop("checked", false);
+        $("#chkPicker").prop("checked", false);
+        $("#chkBoxer").prop("checked", false);
+    }
+
     if (isNative) {
         if (username != "" && fullname != "" && employeeId != "" && password != "" && role != "") {
 
@@ -657,6 +671,21 @@ $(document).on("change", "#txtRoleEdit", function () {
     var employeeId = $("#txtEmployeeIdEdit").val();
     var password = $("#txtPasswordEdit").val();
     var role = $("#txtRoleEdit").val();
+
+    if (role == "Administrator") {
+        $("#chkOmsEdit").prop("checked", true);
+        $("#chkRunnerEdit").prop("checked", false);
+        $("#chkPickerEdit").prop("checked", false);
+        $("#chkBoxerEdit").prop("checked", false);
+    }
+    else {
+        $("#chkOmsEdit").prop("checked", false);
+        $("#chkRunnerEdit").prop("checked", false);
+        $("#chkPickerEdit").prop("checked", false);
+        $("#chkBoxerEdit").prop("checked", false);
+    }
+
+
     if (isNative) {
         if (username != "" && fullname != "" && employeeId != "" && password != "" && role != "") {
 

@@ -10,15 +10,18 @@ using System.Net;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices;
 using SNR_BGC.Utilities;
+using SNR_BGC.Interface;
 
 namespace SNR_BGC.Controllers
 {
     public class UserController : Controller
     {
         private readonly UserClass _userInfoConn;
-        public UserController(UserClass userinfo)
+        private readonly IAuditLoggingServices _auditLoggingServices;
+        public UserController(UserClass userinfo, IAuditLoggingServices auditLoggingServices)
         {
             _userInfoConn = userinfo;
+            _auditLoggingServices = auditLoggingServices;
 
         }
         public IActionResult Index()
@@ -278,18 +281,29 @@ namespace SNR_BGC.Controllers
             return Json(new { set = result });
         }
 
-        public JsonResult DeactivateUser(int id)
+        public async Task<JsonResult> DeactivateUser(int id)
         {
-
-            var result = new UsersTable();
-
-            result = _userInfoConn.usersTable.Where(u => u.userId == id).FirstOrDefault();
+            var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+            var performedById = _userInfoConn.usersTable.Where(w => w.username == claims.Claims.ToList()[0].Value).First().userId;
+            var currentUser = _userInfoConn.usersTable.Where(u => u.userId == id).AsNoTracking().FirstOrDefault();
+            var result = _userInfoConn.usersTable.Where(u => u.userId == id).FirstOrDefault();
             result.userStatus = "Inactive";
+
+            var changes = _auditLoggingServices.GetChangedFields(currentUser, result);
+
+            if (changes.Any())
+            {
+                await _auditLoggingServices.LogChanges(
+                    userId: result.userId,
+                    performedById: performedById,
+                    module: "User Maintenance",
+                    action: "Update User Status",
+                    changes: changes
+                );
+            }
 
             _userInfoConn.Update(result);
             _userInfoConn.SaveChanges();
-
-
 
             var grid = new List<UsersTable>();
 
@@ -297,18 +311,29 @@ namespace SNR_BGC.Controllers
 
             return Json(new { set = grid });
         }
-        public JsonResult ActivateUser(int id)
+        public async Task<JsonResult> ActivateUser(int id)
         {
-
-            var result = new UsersTable();
-
-            result = _userInfoConn.usersTable.Where(u => u.userId == id).FirstOrDefault();
+            var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+            var performedById = _userInfoConn.usersTable.Where(w => w.username == claims.Claims.ToList()[0].Value).First().userId;
+            var currentUser = _userInfoConn.usersTable.Where(u => u.userId == id).AsNoTracking().FirstOrDefault();
+            var result = _userInfoConn.usersTable.Where(u => u.userId == id).FirstOrDefault();
             result.userStatus = "Active";
+
+            var changes = _auditLoggingServices.GetChangedFields(currentUser, result);
+
+            if (changes.Any())
+            {
+                await _auditLoggingServices.LogChanges(
+                    userId: result.userId,
+                    performedById: performedById,
+                    module: "User Maintenance",
+                    action: "Update User Status",
+                    changes: changes
+                );
+            }
 
             _userInfoConn.Update(result);
             _userInfoConn.SaveChanges();
-
-
 
             var grid = new List<UsersTable>();
 
@@ -317,7 +342,7 @@ namespace SNR_BGC.Controllers
             return Json(new { set = grid });
         }
 
-        public JsonResult NewUser(UserModelDTO userform)
+        public async Task<JsonResult> NewUser(UserModelDTO userform)
         {
             try
             {
@@ -332,6 +357,7 @@ namespace SNR_BGC.Controllers
 
                     var userstbl = new UsersTable();
                     var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+                    var performedById = _userInfoConn.usersTable.Where(w => w.username == claims.Claims.ToList()[0].Value).First().userId;
 
                     userstbl.accessType = userform.accessType;
                     userstbl.userFullname = userform.fullname;
@@ -347,13 +373,26 @@ namespace SNR_BGC.Controllers
                     userstbl.userStatus = "Active";
                     userstbl.lastEditDate = DateTime.Now;
                     userstbl.lastEditUser = claims.Claims.ToList()[0].Value;
+                    userstbl.passwordExpiration = userform.role == "Administrator" ? DateTime.Now.AddDays(30) : DateTime.Now.AddDays(90);
                     userstbl.newUser = true;
-
 
                     _userInfoConn.Add(userstbl);
                     _userInfoConn.SaveChanges();
 
+                    var changes = _auditLoggingServices.GetChangedFields(checkUser, userstbl);
 
+                    if (changes.Any())
+                    {
+                        await _auditLoggingServices.LogChanges(
+                            userId: userstbl.userId,
+                            performedById: performedById,
+                            module: "User Maintenance",
+                            action: "Add User",
+                            changes: changes
+                        );
+                    }
+
+                    _userInfoConn.SaveChanges();
                     return Json(new { set = userstbl });
                 }
                 else
@@ -370,16 +409,18 @@ namespace SNR_BGC.Controllers
 
         }
 
-        public JsonResult EditUser(UserModelDTO userform)
+        public async Task<JsonResult> EditUser(UserModelDTO userform)
         {
             try
             {
-                var employeeId = _userInfoConn.usersTable.Where(w => w.employeeId == userform.employeeId && w.userId != userform.userId).FirstOrDefault();
-                if (employeeId != null)
+                var employee = _userInfoConn.usersTable.Where(w => w.employeeId == userform.employeeId && w.userId != userform.userId).FirstOrDefault();
+                if (employee != null)
                     return Json(new { set = "Employee ID is already exist." });
 
-                var userstbl = new UsersTable();
                 var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+                var performedById = _userInfoConn.usersTable.Where(w => w.username == claims.Claims.ToList()[0].Value).First().userId;
+                var currentUser = _userInfoConn.usersTable.Where(w => w.userId == userform.userId).AsNoTracking().FirstOrDefault();
+                var userstbl = _userInfoConn.usersTable.Where(w => w.userId == userform.userId).FirstOrDefault();
 
                 userstbl.userId = userform.userId;
                 userstbl.accessType = userform.accessType;
@@ -396,6 +437,25 @@ namespace SNR_BGC.Controllers
                 userstbl.userStatus = "Active";
                 userstbl.lastEditDate = DateTime.Now;
                 userstbl.lastEditUser = claims.Claims.ToList()[0].Value;
+
+                if (userstbl.password != currentUser.password)
+                {
+                    userstbl.passwordExpiration = userform.role == "Administrator" ? DateTime.Now.AddDays(30) : DateTime.Now.AddDays(90);
+                    userstbl.newUser = true;
+                }
+
+                var changes = _auditLoggingServices.GetChangedFields(currentUser, userstbl);
+
+                if (changes.Any())
+                {
+                    await _auditLoggingServices.LogChanges(
+                        userId: userform.userId,
+                        performedById: performedById,
+                        module: "User Maintenance",
+                        action: "Edit User",
+                        changes: changes
+                    );
+                }
 
                 _userInfoConn.Update(userstbl);
                 _userInfoConn.SaveChanges();

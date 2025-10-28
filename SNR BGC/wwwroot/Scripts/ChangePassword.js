@@ -81,6 +81,10 @@ $(document).on('click', '#btnChangePassword', function () {
             $("#errorDiv").removeClass("d-none");
             $("#errorLabel").text("The new password should not be the default password!")
         }
+        else if (set.set == "UsedPassword") {
+            $("#errorDiv").removeClass("d-none");
+            $("#errorLabel").text("This password has been used recently. Choose a new one.")
+        }
     });
 }); 
 

@@ -125,6 +125,7 @@ namespace SNR_BGC
             services.AddSingleton<IDbAccess, DbAccess>();
             services.AddScoped<IDataRepository, DataRepository>();
             services.AddScoped<IWaybillPrinting, WaybillPrinting>();
+            services.AddScoped<IAuditLoggingServices, AuditLoggingServices>();
             services.AddRazorPages();
 
             //services.AddHostedService<BackgroundWorkerService>();

@@ -27,5 +27,7 @@ namespace SNR_BGC.Models
         public bool? withBoxerAccess { get; set; }
         public bool? newUser { get; set; }
         public string? employeeId { get; set; }
+        public int? failedAttempts { get; set; }
+        public DateTime? passwordExpiration { get; set; }
     }
 }

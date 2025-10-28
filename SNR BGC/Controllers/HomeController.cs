@@ -60,8 +60,12 @@ namespace SNR_BGC.Controllers
             string accessType;
             accessType = _userInfoConn.usersTable.Where(e => e.username == user).Select(a => a.accessType).FirstOrDefault();
 
+            DateTime dateNow = DateTime.Now;
+            bool expired = false;
+            var passwordExpiration = _userInfoConn.usersTable.Where(e => e.username == user).Select(a => a.passwordExpiration).FirstOrDefault();
+            expired = passwordExpiration != null ? passwordExpiration < dateNow : false;
 
-            if (usersTable == true && accessType == "Native")
+            if ((usersTable == true && accessType == "Native") || expired)
             {
                 return RedirectToAction("ChangePassword");
             }
@@ -286,7 +290,7 @@ namespace SNR_BGC.Controllers
                         {
                             if (userTable.userStatus.ToUpper() == "INACTIVE")
                             {
-                                TempData["Error"] = "Failed";
+                                TempData["Error"] = "inactive";
                                 connsd.Close();
                                 return View("login");
                             }
@@ -330,14 +334,21 @@ namespace SNR_BGC.Controllers
 
                     userTable = _userInfoConn.usersTable.Where(e => e.username == username && e.password == EncryptorDecryptor.Encrypt(password)).FirstOrDefault();
 
-
+                    var user = new UsersTable();
                     if (userTable != null)
                     {
                         if (userTable.userStatus.ToUpper() == "INACTIVE")
                         {
-                            TempData["Error"] = "Failed";
+                            TempData["Error"] = "inactive";
                             ViewData["ReturnUrl"] = returnUrl;
-                            return View("login");
+                            return Redirect(returnUrl);
+                        }
+
+                        if (userTable.failedAttempts >= 3)
+                        {
+                            TempData["Error"] = "maxfailedattempts";
+                            ViewData["ReturnUrl"] = returnUrl;
+                            return Redirect(returnUrl);
                         }
 
                         //if (username == "autoreload@snrshopping.com")
@@ -390,6 +401,11 @@ namespace SNR_BGC.Controllers
                         //}
                         //else
                         //{
+
+                        user = _userInfoConn.usersTable.Where(e => e.username == username).FirstOrDefault();
+                        user.failedAttempts = 0;
+                        _userInfoConn.SaveChanges();
+
                         string access = selectapp;
                         string subModule = (userTable.OmsSubModule == null ? "No Module" : userTable.OmsSubModule.ToString());
 
@@ -406,18 +422,35 @@ namespace SNR_BGC.Controllers
                         return Redirect(returnUrl);
 
                     }
+                    else
+                    {
+                        user = _userInfoConn.usersTable.Where(e => e.username == username).FirstOrDefault();
 
-                    TempData["Error"] = "Failed";
+                        if (user != null)
+                        {
+                            user.failedAttempts = user.failedAttempts == null ? 1 : user.failedAttempts += 1;
+                            _userInfoConn.SaveChanges();
 
-                    ViewData["ReturnUrl"] = returnUrl;
-                    return View("login");
+                            if (user.failedAttempts >= 3)
+                            {
+                                TempData["Error"] = "maxfailedattempts";
+                                ViewData["ReturnUrl"] = returnUrl;
+                                return Redirect(returnUrl);
+                            }
+                        }
+
+                        TempData["Error"] = "Failed";
+
+                        ViewData["ReturnUrl"] = returnUrl;
+                        return Redirect(returnUrl);
+                    }
                 }
             }
             else
             {
                 TempData["Error"] = "Failed";
                 ViewData["ReturnUrl"] = returnUrl;
-                return View("login");
+                return Redirect(returnUrl);
             }
 
         }
@@ -563,14 +596,32 @@ namespace SNR_BGC.Controllers
 
                     if (newPass != "Pw@12345")
                     {
+                        var userHistoryList = _userInfoConn.PasswordHistory
+                            .Where(w => w.userId == userTable.userId)
+                            .OrderByDescending(w => w.DateCreated) // or DateChanged / Id
+                            .Take(5)
+                            .ToList();
+
+                        var userHistory = userHistoryList
+                            .Where(w => w.Password == EncryptorDecryptor.Encrypt(newPass))
+                            .FirstOrDefault();
+
+                        if (userHistory != null || oldPass == newPass)
+                            return Json(new { set = "UsedPassword" });
+
+                        //insert into password history
+                        var passwordHistory = new PasswordHistory();
+                        passwordHistory.userId = userTable.userId;
+                        passwordHistory.Password = userTable.password;
+                        passwordHistory.DateCreated = DateTime.Now;
+                        _userInfoConn.PasswordHistory.Add(passwordHistory);
+
                         userTable.password = EncryptorDecryptor.Encrypt(newPass);
                         userTable.newUser = false;
+                        userTable.passwordExpiration = userTable.withOmsAccess == true ? DateTime.Now.AddDays(30) : DateTime.Now.AddDays(90);
                         _userInfoConn.Update(userTable);
 
-
                         _userInfoConn.SaveChanges();
-
-
 
                         return Json(new { set = "Success" });
                     }
