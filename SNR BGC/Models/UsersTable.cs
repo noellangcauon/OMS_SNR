@@ -29,5 +29,6 @@ namespace SNR_BGC.Models
         public string? employeeId { get; set; }
         public int? failedAttempts { get; set; }
         public DateTime? passwordExpiration { get; set; }
+        public string email { get; set; }
     }
 }

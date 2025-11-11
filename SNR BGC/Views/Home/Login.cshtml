@@ -85,17 +85,17 @@
 
                         <form action="/login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnUrl)" method="post" class="user">
                             <div class="input-group border mb-3" style="border-radius: 10rem;">
-                                <input id="txtUserName" type="text" name="username" placeholder="username..." class="form-control form-control-user" />
-                                <div class="input-group-append">
+                                <input id="txtUserName" type="text" name="username" placeholder="Employee Number" class="form-control form-control-user" />
+                              @*   <div class="input-group-append">
                                     <div style="border-radius: 0rem 10rem 10rem 0rem; margin-top:4px;" class="pt-2 px-2" id="">
                                         <span style="cursor: default; font-size: .8rem;">@@snrshopping.com</span>
                                     </div>
-                                </div>
+                                </div> *@
                             </div>
 
 
                             <div class="input-group border" style="border-radius: 10rem;">
-                                <input type="password" name="password" placeholder="password..." id="txtPassword" class="form-control form-control-user border-0" />
+                                <input type="password" name="password" placeholder="Password" id="txtPassword" class="form-control form-control-user border-0" />
                                 <div class="input-group-append hover-effect">
                                     <button class="btn " style="border-radius: 0rem 10rem 10rem 0rem;" id="btnShowPassword" type="button">
                                         <span class="bi bi-eye"></span>
@@ -157,7 +157,7 @@
                             else
                             {
                                 <div class="alert alert-danger" style="margin-top:2%;">
-                                    <strong>Failed to Login!</strong> Please input correct username and password.
+                                    <strong>Failed to Login!</strong> Please input correct Employee Number and Password.
                                 </div>
                             }
                         }

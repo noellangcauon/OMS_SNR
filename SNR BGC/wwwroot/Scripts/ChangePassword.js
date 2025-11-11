@@ -41,15 +41,20 @@ $(document).on('touchend', '#btnShowPasswordNew', function () {
 
 
 $(document).on('click', '#btnChangePassword', function () {
-    var oldPass = $('#txtPassword').val();
-    var newPass = $('#txtPasswordNew').val();
-    var confirmPass = $('#txtPasswordConfirm').val();
-
-
+    var data = {
+        oldPass: $('#txtPassword').val(),
+        newPass: $('#txtPasswordNew').val(),
+        confirmPass: $('#txtPasswordConfirm').val()
+    };
 
     $.ajax({
         type: "POST",
-        url: "/Home/CheckPasswords?oldPass=" + oldPass + "&newPass=" + newPass + "&confirmPass=" + confirmPass,
+        url: "/Home/CheckPasswords",
+        data: {
+            oldPass: $('#txtPassword').val(),
+            newPass: $('#txtPasswordNew').val(),
+            confirmPass: $('#txtPasswordConfirm').val()
+    },
     }).done(function (set) {
         if (set.set == "Success") {
             Swal.fire({

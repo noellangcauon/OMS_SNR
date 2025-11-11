@@ -1,28 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SNR_BGC.Interface;
+using SNR_BGC.Models;
+using SNR_BGC.Models.UserAccount_AuditingTool;
+using SNR_BGC.Services;
+using SNR_BGC.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SNR_BGC.Models;
-using System.Net.Http;
-using System.Net;
-using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices;
-using SNR_BGC.Utilities;
-using SNR_BGC.Interface;
+using System.DirectoryServices.AccountManagement;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace SNR_BGC.Controllers
 {
     public class UserController : Controller
     {
         private readonly UserClass _userInfoConn;
+        private readonly PPHContext _pphContext;
         private readonly IAuditLoggingServices _auditLoggingServices;
-        public UserController(UserClass userinfo, IAuditLoggingServices auditLoggingServices)
+        private readonly IPasswordGeneratorService _passwordGeneratorService;
+        private readonly IEmailSendingService _emailSendingService;
+        public UserController(UserClass userinfo, PPHContext pphContext, IAuditLoggingServices auditLoggingServices, IPasswordGeneratorService passwordGeneratorService, IEmailSendingService emailSendingService)
         {
             _userInfoConn = userinfo;
             _auditLoggingServices = auditLoggingServices;
-
+            _pphContext = pphContext;
+            _passwordGeneratorService = passwordGeneratorService;
+            _emailSendingService = emailSendingService;
         }
         public IActionResult Index()
         {
@@ -342,12 +349,40 @@ namespace SNR_BGC.Controllers
             return Json(new { set = grid });
         }
 
+        [HttpGet]
+        public JsonResult GetEmployees(string term)
+        {
+            var result = _pphContext.PPH_Employee_Details
+                .Where(e => e.EmployeeCode.Contains(term) 
+                                && (e.EmploymentStatus == true
+                                    || (e.EmploymentStatus == false && e.DateDeactivated >= DateTime.Now.Date)
+                                    || (e.EmploymentStatus == false && e.DateSeparated >= DateTime.Now.Date)
+                                   )
+                      )
+                .Select(e => new { label = string.Format("{0} - {1} {2}", e.EmployeeCode, e.FirstName, e.LastName), value = e.EmployeeCode, name = string.Format("{0} {1}", e.FirstName, e.LastName) });
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public JsonResult CheckEmployeeExists(string employeeId)
+        {
+            bool exists = _pphContext.PPH_Employee_Details
+                .Any(e => e.EmployeeCode == employeeId
+                                && (e.EmploymentStatus == true
+                                    || (e.EmploymentStatus == false && e.DateDeactivated >= DateTime.Now.Date)
+                                    || (e.EmploymentStatus == false && e.DateSeparated >= DateTime.Now.Date)
+                                   )
+                      );
+            return Json(exists);
+        }
+
         public async Task<JsonResult> NewUser(UserModelDTO userform)
         {
             try
             {
                 var checkUser = new UsersTable();
-                checkUser = _userInfoConn.usersTable.Where(u => u.username == userform.username + "@snrshopping.com").FirstOrDefault();
+                checkUser = _userInfoConn.usersTable.Where(u => u.username == userform.username).FirstOrDefault();
 
                 if (checkUser == null)
                 {
@@ -359,11 +394,15 @@ namespace SNR_BGC.Controllers
                     var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
                     var performedById = _userInfoConn.usersTable.Where(w => w.username == claims.Claims.ToList()[0].Value).First().userId;
 
+                    string password = _passwordGeneratorService.GeneratePassword(8);
+
                     userstbl.accessType = userform.accessType;
                     userstbl.userFullname = userform.fullname;
                     userstbl.employeeId = userform.employeeId;
-                    userstbl.username = userform.username + "@snrshopping.com";
-                    userstbl.password = userform.accessType == "AD" ? null : EncryptorDecryptor.Encrypt(userform.password);
+                    userstbl.username = userform.username;
+                    //userstbl.password = userform.accessType == "AD" ? null : EncryptorDecryptor.Encrypt(userform.password);
+                    userstbl.password = EncryptorDecryptor.Encrypt(password);
+                    userstbl.email = userform.email + "@snrshopping.com";
                     userstbl.userRole = userform.role;
                     userstbl.withOmsAccess = userform.oms;
                     userstbl.withRunnerAccess = userform.runnerapp;
@@ -378,6 +417,8 @@ namespace SNR_BGC.Controllers
 
                     _userInfoConn.Add(userstbl);
                     _userInfoConn.SaveChanges();
+
+                    _emailSendingService.SendEmailForTempPassword(userstbl.email, userstbl.userFullname, "Your Secure Temporary Password", userform.username, password);
 
                     var changes = _auditLoggingServices.GetChangedFields(checkUser, userstbl);
 
@@ -425,9 +466,9 @@ namespace SNR_BGC.Controllers
                 userstbl.userId = userform.userId;
                 userstbl.accessType = userform.accessType;
                 userstbl.userFullname = userform.fullname;
-                userstbl.username = userform.username + "@snrshopping.com";
+                userstbl.username = userform.employeeId;
+                userstbl.email = userform.email + "@snrshopping.com";
                 userstbl.employeeId = userform.employeeId;
-                userstbl.password = userform.password == null ? null : EncryptorDecryptor.Encrypt(userform.password);
                 userstbl.userRole = userform.role;
                 userstbl.withOmsAccess = userform.oms;
                 userstbl.withRunnerAccess = userform.runnerapp;
@@ -438,11 +479,19 @@ namespace SNR_BGC.Controllers
                 userstbl.lastEditDate = DateTime.Now;
                 userstbl.lastEditUser = claims.Claims.ToList()[0].Value;
 
-                if (userstbl.password != currentUser.password)
-                {
-                    userstbl.passwordExpiration = userform.role == "Administrator" ? DateTime.Now.AddDays(30) : DateTime.Now.AddDays(90);
-                    userstbl.newUser = true;
-                }
+                //var encryptedPassword = EncryptorDecryptor.Encrypt(userform.password);
+                //if (encryptedPassword != currentUser.password && userform.password != "********") //if password changed
+                //{
+                //    var passwordHistory = new PasswordHistory();
+                //    passwordHistory.userId = userstbl.userId;
+                //    passwordHistory.Password = userstbl.password;
+                //    passwordHistory.DateCreated = DateTime.Now;
+                //    _userInfoConn.PasswordHistory.Add(passwordHistory);
+
+                //    userstbl.password = encryptedPassword;
+                //    userstbl.passwordExpiration = userform.role == "Administrator" ? DateTime.Now.Date.AddDays(30) : DateTime.Now.Date.AddDays(90);
+                //    userstbl.newUser = true;
+                //}
 
                 var changes = _auditLoggingServices.GetChangedFields(currentUser, userstbl);
 
@@ -472,8 +521,64 @@ namespace SNR_BGC.Controllers
             }
 
         }
+
+        public async Task<JsonResult> RegeneratePassword(int id)
+        {
+            try
+            {
+                var currentUser = _userInfoConn.usersTable.Where(w => w.userId == id).AsNoTracking().FirstOrDefault();
+                var userstbl = _userInfoConn.usersTable.Where(w => w.userId == id).FirstOrDefault();
+                if (userstbl == null)
+                        return Json(new { set = "User not found." });
+
+
+                var passwordHistory = new PasswordHistory();
+                passwordHistory.userId = userstbl.userId;
+                passwordHistory.Password = userstbl.password;
+                passwordHistory.DateCreated = DateTime.Now;
+                _userInfoConn.PasswordHistory.Add(passwordHistory);
+
+                string password = _passwordGeneratorService.GeneratePassword(8);
+                userstbl.password = EncryptorDecryptor.Encrypt(password); ;
+                userstbl.passwordExpiration = userstbl.userRole == "Administrator" ? DateTime.Now.Date.AddDays(30) : DateTime.Now.Date.AddDays(90);
+                userstbl.newUser = true;
+
+                _userInfoConn.usersTable.Update(userstbl);
+                _userInfoConn.SaveChanges();
+
+                _emailSendingService.SendEmailForTempPassword(userstbl.email, userstbl.userFullname, "Your Secure Temporary Password", userstbl.username, password);
+
+                var claims = (System.Security.Claims.ClaimsIdentity)User.Identity;
+                var performedById = _userInfoConn.usersTable.Where(w => w.username == claims.Claims.ToList()[0].Value).First().userId;
+                var changes = _auditLoggingServices.GetChangedFields(currentUser, userstbl);
+
+                if (changes.Any())
+                {
+                    await _auditLoggingServices.LogChanges(
+                        userId: userstbl.userId,
+                        performedById: performedById,
+                        module: "User Maintenance",
+                        action: "Edit User",
+                        changes: changes
+                    );
+                }
+
+                _userInfoConn.SaveChanges();
+                var grid = _userInfoConn.usersTable.Where(u => u.userStatus == "Active").ToList();
+                return Json(new { set = grid });
+
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { set = ex });
+            }
+
+        }
+
         public JsonResult EditForm(int id)
         {
+            //do not return the password!
             try
             {
                 var result = new UsersTable();
@@ -481,9 +586,10 @@ namespace SNR_BGC.Controllers
                 result = _userInfoConn.usersTable.Where(u => u.userId == id).FirstOrDefault();
                 if(result.password != null)
                 {
-                    result.password = EncryptorDecryptor.Decrypt(result.password);
+                    //var result = EncryptorDecryptor.Decrypt(result.password);
+                    result.password = "********";
                 }
-                
+
                 _userInfoConn.Dispose();
                 return Json(new { set = result });
 

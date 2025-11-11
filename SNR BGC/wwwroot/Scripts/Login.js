@@ -13,7 +13,8 @@ $(document).on('touchend', '#btnShowPassword', function () {
 
 
 function updateSelectedOption() {
-    var username = $("#txtUserName").val().trim() + "@snrshopping.com";
+    //var username = $("#txtUserName").val().trim() + "@snrshopping.com";
+    var username = $("#txtUserName").val().trim();
 
     $.ajax({
         url: '/Home/YourAjaxAction',

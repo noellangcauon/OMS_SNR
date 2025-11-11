@@ -12,3 +12,44 @@
     width: 100% !important;
 }
 
+/* remove bullets and fix spacing */
+.ui-autocomplete {
+    z-index: 999999 !important;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    list-style: none;
+}
+
+/* remove bullet and add padding per item */
+.ui-menu-item {
+    list-style: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+    /* last item clean bottom */
+    .ui-menu-item:last-child {
+        border-bottom: none;
+    }
+
+/* focused (highlighted) item */
+.ui-state-focus,
+.ui-menu-item-wrapper.ui-state-active {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+/* ensure text has default color */
+.ui-menu-item-wrapper {
+    color: #333;
+}
+
+.ui-helper-hidden-accessible{
+    display: none;
+}

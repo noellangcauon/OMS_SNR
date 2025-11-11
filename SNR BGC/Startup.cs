@@ -1,28 +1,29 @@
+using Infrastructure.External.ShopeeWebApi;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Polly;
+using Serilog;
+using Serilog.Events;
+using SNR_BGC.Controllers;
+using SNR_BGC.DataAccess;
+using SNR_BGC.Hubs;
+using SNR_BGC.Interface;
+using SNR_BGC.Models;
+using SNR_BGC.Models.UserAccount_AuditingTool;
+using SNR_BGC.Services;
+using SNR_BGC.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SNR_BGC.Models;
 using System.Net.Http;
-using SNR_BGC.Controllers;
-using Polly;
-using Infrastructure.External.ShopeeWebApi;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Events;
-using SNR_BGC.DataAccess;
-using SNR_BGC.Utilities;
-using SNR_BGC.Hubs;
-using SNR_BGC.Interface;
-using SNR_BGC.Services;
+using System.Threading.Tasks;
 
 namespace SNR_BGC
 {
@@ -82,6 +83,12 @@ namespace SNR_BGC
                 // You can also configure other options here if needed
             }));
 
+            services.AddDbContext<PPHContext>(options => options.UseSqlServer(Configuration.GetConnectionString("UserAccount_AuditingTool"), sqlServerOptions =>
+            {
+                sqlServerOptions.EnableRetryOnFailure();
+                // You can also configure other options here if needed
+            }));
+
             //services.AddSingleton<IAuthenthicationTokenFlowManager>(
             //   s => new DatabaseStoreAuthenthicationTokenFlowManager(
             //       configuration: s.GetRequiredService<IConfiguration>(),
@@ -126,6 +133,8 @@ namespace SNR_BGC
             services.AddScoped<IDataRepository, DataRepository>();
             services.AddScoped<IWaybillPrinting, WaybillPrinting>();
             services.AddScoped<IAuditLoggingServices, AuditLoggingServices>();
+            services.AddScoped<IPasswordGeneratorService, PasswordGeneratorService>();
+            services.AddScoped<IEmailSendingService, EmailSendingService>();
             services.AddRazorPages();
 
             //services.AddHostedService<BackgroundWorkerService>();

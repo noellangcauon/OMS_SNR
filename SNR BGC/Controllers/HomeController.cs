@@ -171,7 +171,8 @@ namespace SNR_BGC.Controllers
 
         private List<SelectListItem> GetOptions(string username)
         {
-            var result = _userInfoConn.usersTable.Where(u => u.username == username).FirstOrDefault();
+            var result = _userInfoConn.usersTable.Where(u => u.employeeId == username).FirstOrDefault();
+            username = result != null ? result.username : null;
 
             if (result == null)
             {
@@ -256,7 +257,9 @@ namespace SNR_BGC.Controllers
                 selectapp = string.Empty;
             }
 
-            username = username + "@snrshopping.com";
+            var usersTable = _userInfoConn.usersTable.FirstOrDefault(w => w.employeeId == username);
+            username = usersTable != null ? usersTable.username : null;
+            //username = username + "@snrshopping.com";
             //Modified 
             //split username;
             if (username != null || password != null)
@@ -580,6 +583,7 @@ namespace SNR_BGC.Controllers
 
         }
 
+        [HttpPost]
         public JsonResult CheckPasswords(string oldPass, string newPass, string confirmPass)
         {
             var userTable = new UsersTable();
@@ -593,44 +597,37 @@ namespace SNR_BGC.Controllers
             {
                 if (newPass == confirmPass)
                 {
+                    var userHistoryList = _userInfoConn.PasswordHistory
+                        .Where(w => w.userId == userTable.userId)
+                        .OrderByDescending(w => w.DateCreated) // or DateChanged / Id
+                        .Take(5)
+                        .ToList();
 
-                    if (newPass != "Pw@12345")
+                    var userHistory = userHistoryList
+                        .Where(w => w.Password == EncryptorDecryptor.Encrypt(newPass))
+                        .FirstOrDefault();
+
+                    if (userHistory != null || oldPass == newPass)
+                        return Json(new { set = "UsedPassword" });
+
+                    if (!userTable.newUser.Value) //if current password is not a temporary password then insert it into password history.
                     {
-                        var userHistoryList = _userInfoConn.PasswordHistory
-                            .Where(w => w.userId == userTable.userId)
-                            .OrderByDescending(w => w.DateCreated) // or DateChanged / Id
-                            .Take(5)
-                            .ToList();
-
-                        var userHistory = userHistoryList
-                            .Where(w => w.Password == EncryptorDecryptor.Encrypt(newPass))
-                            .FirstOrDefault();
-
-                        if (userHistory != null || oldPass == newPass)
-                            return Json(new { set = "UsedPassword" });
-
                         //insert into password history
                         var passwordHistory = new PasswordHistory();
                         passwordHistory.userId = userTable.userId;
                         passwordHistory.Password = userTable.password;
                         passwordHistory.DateCreated = DateTime.Now;
                         _userInfoConn.PasswordHistory.Add(passwordHistory);
-
-                        userTable.password = EncryptorDecryptor.Encrypt(newPass);
-                        userTable.newUser = false;
-                        userTable.passwordExpiration = userTable.withOmsAccess == true ? DateTime.Now.AddDays(30) : DateTime.Now.AddDays(90);
-                        _userInfoConn.Update(userTable);
-
-                        _userInfoConn.SaveChanges();
-
-                        return Json(new { set = "Success" });
-                    }
-                    else
-                    {
-                        return Json(new { set = "DefaultPassword" });
-
                     }
 
+                    userTable.password = EncryptorDecryptor.Encrypt(newPass);
+                    userTable.newUser = false;
+                    userTable.passwordExpiration = userTable.withOmsAccess == true ? DateTime.Now.Date.AddDays(30) : DateTime.Now.Date.AddDays(90);
+                    _userInfoConn.Update(userTable);
+
+                    _userInfoConn.SaveChanges();
+
+                    return Json(new { set = "Success" });
                 }
                 else
                 {

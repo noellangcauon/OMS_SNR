@@ -5,6 +5,7 @@
 
     var userRole = claimsIdentity.Claims.ToList()[2].Value;
     var userAccess = claimsIdentity.Claims.ToList()[3].Value;
+    var userFullname = claimsIdentity.Claims.ToList()[5].Value;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -322,7 +323,7 @@
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     @if (userAccess.Contains("OMS"))
                                     {
-                                        <span class="mr-2 d-none d-lg-inline text-gray-800 " id="userNameProfile">@User.Claims.First().Value</span>
+                                        <span class="mr-2 d-none d-lg-inline text-gray-800 " id="userNameProfile">@userFullname</span>
                                     }
                                     <img class="img-profile rounded-circle"
                                      src="../img/undraw_profile.svg">
@@ -333,7 +334,7 @@
                                      aria-labelledby="userDropdown">
                                     <a class="dropdown-item" href="/">
                                         <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                        @User.Claims.First().Value
+                                        @userFullname
                                     </a>
                                     @if (userAccess.Contains("Boxer"))
                                     {

@@ -11,6 +11,8 @@ namespace SNR_BGC.Models
         [Required]
         public string username { get; set; }
         [Required]
+        public string email { get; set; }
+        [Required]
         public string employeeId { get; set; }
         public string password { get; set; }
         [Required]

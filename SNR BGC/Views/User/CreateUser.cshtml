@@ -54,10 +54,11 @@
 
                                     <th style="white-space: nowrap; color: blue;">ID</th>
                                     <th style="white-space: nowrap; color: blue;">Username</th>
-                                    <th style="white-space: nowrap; color: blue;">Employee ID</th>
+                                    <th style="white-space: nowrap; color: blue;">Employee Number</th>
                                     <th style="white-space: nowrap; color: blue;">Fullname</th>
                                     <th style="white-space: nowrap; color: blue;">Role</th>
                                     <th style="white-space: nowrap; color: blue;">Access Type</th>
+                                    <th style="white-space: nowrap; color: blue;">Locked</th>
                                     <th style="white-space: nowrap; color: blue;">Module</th>
                                     <th></th>
                                 </tr>
@@ -100,24 +101,31 @@
                             <div class="">
                                 <label class="control-label">Access Type </label>
                                 <div class="col-md-12">
-                                    <label><input type="radio" id="radioAD" name="accessType" value="AD" checked /> Active Directory</label>
+                                    <label hidden><input type="radio" id="radioAD" name="accessType" value="AD" /> Active Directory</label>
 
-                                    <label class="pl-lg-4"><input type="radio" id="radioNative" name="accessType" value="Native" /> Native</label>
+                                    <label class="pl-lg-4"><input type="radio" id="radioNative" name="accessType" value="Native" checked/> Native</label>
                                 </div>
                             </div>
 
                         </div>
-                        <div class="form-group">
-                            <label class="control-label">Fullname <span class="text-danger">*</span></label>
-                            <input name="fullname" id="txtFullname" class="form-control" required />
+                        <div class="form-group position-relative">
+                            <label class="control-label">Employee Number <span class="text-danger">*</span></label>
+                            <div style="position: relative;">
+                                <input name="employeeId" id="txtEmployeeId" class="form-control" required autocomplete="off" />
+                                <!-- inline spinner -->
+                                <div id="autoLoading" hidden
+                                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+                                    <span class="spinner-border spinner-border-sm text-primary"></span>
+                                </div>
+                            </div>
                             <span class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label class="control-label">Employee ID <span class="text-danger">*</span></label>
-                            <input name="employeeId" id="txtEmployeeId" class="form-control" required />
+                            <label class="control-label">Full Name <span class="text-danger">*</span></label>
+                            <input name="fullname" id="txtFullname" class="form-control" disabled required />
                             <span class="text-danger"></span>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" hidden>
                             <label class="control-label">Username <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input name="username" id="txtUsername" class="form-control" required>
@@ -128,7 +136,17 @@
 
                             <span class="text-danger"></span>
                         </div>
-                        <div class="form-group" id="passwordField">
+                        <div class="form-group">
+                            <label class="control-label">Email</label>
+                            <div class="input-group">
+                                <input name="email" id="txtEmail" class="form-control" required>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">@@snrshopping.com</span>
+                                </div>
+                            </div>
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="form-group" id="passwordField" hidden>
                             <label class="control-label">Password <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <input name="password" type="password" id="txtPassword" class="form-control" />
@@ -160,7 +178,6 @@
                                 <option value="User">User</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <div class="">
                                 <label class="control-label">Module </label>
@@ -180,11 +197,12 @@
             </div>
 
             <div class="modal-footer">
+                
                 <input type="submit" value="Save" class="btn btn-primary" id="btnSave" />
                 @if (!string.IsNullOrEmpty(error))
                 {
                     <div class="alert alert-danger" style="margin-top:2%;">
-                        <strong>Failed to Login!</strong> Please input correct username and password.
+                        <strong>Failed to Login!</strong> Please input correct email and password.
                     </div>
 
                 }
@@ -227,20 +245,45 @@
                                 <div class="">
                                     <label class="control-label">Access Type </label>
                                     <div class="col-md-12">
-                                        <label><input type="radio" id="radioADEdit" name="accessTypeEdit" value="AD" disabled /> Active Directory</label>
+                                        <label hidden><input type="radio" id="radioADEdit" name="accessTypeEdit" value="AD" disabled /> Active Directory</label>
 
                                         <label class="pl-lg-4"><input type="radio" id="radioNativeEdit" name="accessTypeEdit" value="Native" disabled /> Native</label>
                                     </div>
                                 </div>
 
                             </div>
+                           @*  <div class="form-group">
+                                <label class="control-label">Employee ID <span class="text-danger">*</span></label>
+                                <input name="employeeid" id="txtEmployeeIdEdit" class="form-control" />
+                                <span class="text-danger"></span>
+                            </div>
                             <div class="form-group">
                                 <label class="control-label">Fullname <span class="text-danger">*</span></label>
                                 <input name="fullname" id="txtFullnameEdit" class="form-control" disabled />
                                 <span class="text-danger"></span>
+                            </div> *@
+
+                            <div class="form-group position-relative">
+                                <label class="control-label">Employee Number <span class="text-danger">*</span></label>
+                                <div style="position: relative;">
+                                    <input name="employeeId" id="txtEmployeeIdEdit" class="form-control" required autocomplete="off" />
+                                    <!-- inline spinner -->
+                                    <div id="autoLoadingEdit" hidden
+                                         style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+                                        <span class="spinner-border spinner-border-sm text-primary"></span>
+                                    </div>
+                                </div>
+                                <span class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
-                                <label class="control-label">Username <span class="text-danger">*</span></label>
+                                <label class="control-label">Full Name <span class="text-danger">*</span></label>
+                                <input name="fullname" id="txtFullnameEdit" class="form-control" disabled />
+                                <span class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group" hidden>
+                                <label class="control-label">Email <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input name="username" id="txtUsernameEdit" class="form-control" disabled>
                                     <div class="input-group-append">
@@ -251,11 +294,16 @@
                                 <span class="text-danger"></span> 
                             </div>
                             <div class="form-group">
-                                <label class="control-label">Employee ID <span class="text-danger">*</span></label>
-                                <input name="employeeid" id="txtEmployeeIdEdit" class="form-control" />
+                                <label class="control-label">Email</label>
+                                <div class="input-group">
+                                    <input name="email" id="txtEmailEdit" class="form-control" required>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">@@snrshopping.com</span>
+                                    </div>
+                                </div>
                                 <span class="text-danger"></span>
                             </div>
-                            <div class="form-group" id="passwordFieldEdit">
+                            <div class="form-group" id="passwordFieldEdit" hidden>
                                 <label class="control-label">Password <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input name="password" type="password" id="txtPasswordEdit" class="form-control" />
@@ -263,6 +311,9 @@
                                         <button class="btn btn-success" id="resetPassword"><i class="bi bi-arrow-clockwise"></i></button>
                                         <span class="input-group-text d-none" id="showPasswordEdit"><i class="bi bi-eye"></i></span>
                                     </div>
+                                </div>
+                                <div id="lblPwRequiredEdit" class="d-none">
+                                    <span class="text-danger ml-md-2">•Password is required</span>
                                 </div>
                                 <div id="lblUppercaseEdit" class="d-none">
                                     <span class="text-danger ml-md-2">•Password must have Uppercase</span>
@@ -310,15 +361,15 @@
                             @if (!string.IsNullOrEmpty(error))
                             {
                                 <div class="alert alert-danger" style="margin-top:2%;">
-                                    <strong>Failed to Login!</strong> Please input correct username and password.
+                                    <strong>Failed to Login!</strong> Please input correct email and password.
                                 </div>
 
                             }
                             <div class="modal-footer">
-
-                                <div class="col-md-1">
-                                    <input type="submit" value="Update" class="btn btn-primary" id="btnUpdate" />
-                                </div>
+                                <button class="btn btn-success" style="width:150px" data-toggle="modal" data-target="#resetPasswordModal" data-dismiss="modal">
+                                    <i class="bi bi-arrow-repeat"></i> Reset Password
+                                </button>
+                                <input type="submit" value="Update" class="btn btn-primary" id="btnUpdate" />
                             </div>
                         </div>
                     </div>
@@ -326,6 +377,23 @@
             </div>
 
 
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-example-modal-lg" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetPasswordModal">Reset Password</h5>
+                <button class="close" onclick="cancelReset()" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Resetting this password will send a temporary password to <strong id="userEmailText"></strong>.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="cancel()" data-dismiss="modal">Cancel</button>
+                <button id="logout" type="button" onclick="ResetPassword()" class="btn btn-primary" data-dismiss="modal">Reset</button>
+            </div>
         </div>
     </div>
 </div>
@@ -355,7 +423,7 @@
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">Employee ID is missing. Please update the Employee ID before proceeding with activation.</div>
+            <div class="modal-body">Employee Number is missing. Please update the Employee Number before proceeding with activation.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" onclick="cancelActivate()" data-dismiss="modal">Cancel</button>
                 <button id="logout" type="button" onclick="EditUserToActivate()" class="btn btn-primary" data-dismiss="modal">Edit User</button>
